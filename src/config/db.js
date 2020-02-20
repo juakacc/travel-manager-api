@@ -18,7 +18,6 @@ const sequelize = new Sequelize(database_db, username_db, password_db, {
     host: local_db,
     dialect: 'mysql',
     dialectOptions: {
-        // useUTC: false, // for reading from database
         dateStrings: true,
         typeCast: function (field, next) { // for reading from database
             if (field.type === 'DATETIME') {
