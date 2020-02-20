@@ -2,10 +2,11 @@ const express = require('express')
 const Motorista = require('../model/Motorista')
 const HttpStatus = require('http-status-codes')
 const bcrypt = require('bcryptjs')
+const check_auth = require('../middleware/check_auth')
 
 const router = express.Router()
 
-router.get('/', (req, res, next) => {
+router.get('/', check_auth, (req, res, next) => {
     Motorista.findAll()
     .then(motoristas => {
         const result = motoristas.map(motorista => {           
@@ -22,7 +23,7 @@ router.get('/', (req, res, next) => {
     })
 })
 
-router.get('/:motoristaId', (req, res, next) => {
+router.get('/:motoristaId', check_auth, (req, res, next) => {
     const id = req.params.motoristaId
     Motorista.findByPk(id)
     .then(motorista => {
@@ -68,7 +69,7 @@ router.post('/', (req, res, next) => {
     })
 })
 
-router.delete('/:motoristaId', (req, res, next) => {
+router.delete('/:motoristaId', check_auth, (req, res, next) => {
     const id = req.params.motoristaId
 
     Motorista.destroy({

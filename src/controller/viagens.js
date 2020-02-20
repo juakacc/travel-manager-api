@@ -2,6 +2,7 @@ const express = require('express')
 const HttpStatus = require('http-status-codes')
 const sequelize = require('sequelize')
 const Op = sequelize.Op
+const check_auth = require('../middleware/check_auth')
 
 const Veiculo = require('../model/Veiculo')
 const Motorista = require('../model/Motorista')
@@ -9,7 +10,7 @@ const Viagem = require('../model/Viagem')
 
 const router = express.Router()
 
-router.get('/', (req, res, next) => {
+router.get('/', check_auth, (req, res, next) => {
 
     const { date, status } = req.query
 
@@ -98,7 +99,7 @@ router.get('/', (req, res, next) => {
     }    
 })
 
-router.get('/:viagemId', (req, res, next) => {
+router.get('/:viagemId', check_auth, (req, res, next) => {
     Viagem.findByPk(req.params.viagemId)
     .then(viagem => {
         if (!viagem) {
@@ -115,7 +116,7 @@ router.get('/:viagemId', (req, res, next) => {
     })
 })
 
-router.get('/atual/:motoristaId', (req, res, next) => {
+router.get('/atual/:motoristaId', check_auth, (req, res, next) => {
     const { motoristaId } = req.params
 
     Viagem.findAll({
@@ -141,7 +142,7 @@ router.get('/atual/:motoristaId', (req, res, next) => {
     })
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', check_auth, async (req, res, next) => {
 
     const { saida, km_inicial, descricao, veiculo, motorista } = req.body
 
@@ -196,7 +197,7 @@ router.post('/', async (req, res, next) => {
     })
 })
 
-router.put('/:viagemId', async (req, res, next) => {
+router.put('/:viagemId', check_auth, async (req, res, next) => {
     const { viagemId } = req.params
 
     const viagem = await Viagem.findByPk(viagemId)
@@ -245,7 +246,7 @@ router.put('/:viagemId', async (req, res, next) => {
     })
 })
 
-router.delete('/:viagemId', (req, res, next) => {
+router.delete('/:viagemId', check_auth, (req, res, next) => {
     const id = req.params.viagemId
 
     Viagem.destroy({

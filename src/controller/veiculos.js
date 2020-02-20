@@ -1,10 +1,11 @@
 const express = require('express')
 const Veiculo = require('../model/Veiculo')
 const HttpStatus = require('http-status-codes')
+const check_auth = require('../middleware/check_auth')
 
 const router = express.Router()
 
-router.get('/', (req, res, next) => {
+router.get('/', check_auth, (req, res, next) => {
     Veiculo.findAll()
     .then(veiculos => {
         res.status(HttpStatus.OK).json(veiculos)
@@ -17,7 +18,7 @@ router.get('/', (req, res, next) => {
     })
 })
 
-router.get('/disponiveis', (req, res, next) => {
+router.get('/disponiveis', check_auth, (req, res, next) => {
     Veiculo.findAll({
         where: { disponivel: true }        
     })
@@ -32,7 +33,7 @@ router.get('/disponiveis', (req, res, next) => {
     })
 })
 
-router.get('/:veiculoId', (req, res, next) => {
+router.get('/:veiculoId', check_auth, (req, res, next) => {
     const id = req.params.veiculoId
 
     Veiculo.findByPk(id)
@@ -52,7 +53,7 @@ router.get('/:veiculoId', (req, res, next) => {
     })
 })
 
-router.post('/', (req, res, next) => {
+router.post('/', check_auth, (req, res, next) => {
     Veiculo.create(req.body)
     .then(veiculo => {
         res.status(HttpStatus.CREATED).json(veiculo.dataValues)
@@ -64,7 +65,7 @@ router.post('/', (req, res, next) => {
     })
 })
 
-router.delete('/:veiculoId', (req, res, next) => {
+router.delete('/:veiculoId', check_auth, (req, res, next) => {
     const id = req.params.veiculoId
 
     Veiculo.destroy({
