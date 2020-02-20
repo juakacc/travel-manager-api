@@ -24,13 +24,18 @@ const Motorista = sequelize.define('motorista', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    disponivel: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
     senha: {
         type: DataTypes.TEXT,
         allowNull: false
     }
 }, {
-    timestamp: false
+    timestamps: false,
+    freezeTableName: true
 })
 
-Motorista.sync()
+// Motorista.sync()
 module.exports = Motorista

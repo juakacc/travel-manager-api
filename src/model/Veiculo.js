@@ -40,5 +40,5 @@ const Veiculo = sequelize.define('veiculo', {
     freezeTableName: true
 })
 
-Veiculo.sync()
+// Veiculo.sync()
 module.exports = Veiculo

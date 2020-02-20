@@ -4,6 +4,8 @@ const morgan = require('morgan')
 const bodyparse = require('body-parser')
 
 const veiculoRotas = require('./controller/veiculos')
+const motoristaRotas = require('./controller/motoristas')
+const viagensRotas = require('./controller/viagens')
 
 app.use(morgan('dev'))
 app.use(bodyparse.urlencoded({
@@ -16,5 +18,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/veiculos', veiculoRotas)
+app.use('/motoristas', motoristaRotas)
+app.use('/viagens', viagensRotas)
 
 module.exports = app
