@@ -207,7 +207,10 @@ const checkCNH = (motorista, veiculo) => {
 
 router.post('/', check_auth, async (req, res, next) => {
 
-    const { saida, km_inicial, descricao, veiculo, motorista } = req.body
+    const { saida, km_inicial, descricao } = req.body
+
+    const veiculo = req.body.veiculo.id
+    const motorista = req.body.motorista.id
 
     const veiculoBD = await Veiculo.findByPk(veiculo)
     if (!veiculoBD) {
