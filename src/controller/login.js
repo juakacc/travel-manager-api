@@ -42,6 +42,7 @@ router.post('/', (req, res, next) => {
         })
     })
     .catch(err => {
+        console.log(err)
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             mensagem: err
         })
