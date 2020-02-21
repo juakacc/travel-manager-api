@@ -183,6 +183,28 @@ router.get('/atual/:motoristaId', check_auth, (req, res, next) => {
     })
 })
 
+const checkCNH = (motorista, veiculo) => {
+
+    if (motorista === veiculo) return true;
+		
+    if (!motorista || !veiculo) return false;
+    
+    switch (veiculo) {
+        case 'A':
+            return ['AB', 'AC', 'AD', 'AE'].includes(motorista)
+        case 'B':
+            return ['AB', 'AC', 'AD', 'AE', 'C', 'D', 'E'].includes(motorista)
+        case 'C':
+            return ['AC', 'AD', 'AE', 'D', 'E'].includes(motorista)
+        case 'D':
+            return ['AD', 'E'].includes(motorista)
+        case 'E':
+            return ['AE'].includes(motorista)
+        default:
+            return false;
+    }
+}
+
 router.post('/', check_auth, async (req, res, next) => {
 
     const { saida, km_inicial, descricao, veiculo, motorista } = req.body
@@ -211,7 +233,11 @@ router.post('/', check_auth, async (req, res, next) => {
         })
     }
 
-    // Verificar habilitação
+    if (!checkCNH(motoristaBD.dataValues.cnh, veiculoBD.dataValues.cnh_requerida)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'CNH incompatível com o modelo do veículo'
+        })
+    }
 
     Viagem.create({
         saida,
