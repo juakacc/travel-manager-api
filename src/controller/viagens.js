@@ -4,11 +4,30 @@ const sequelize = require('sequelize')
 const Op = sequelize.Op
 const check_auth = require('../middleware/check_auth')
 
-const Veiculo = require('../model/Veiculo')
-const Motorista = require('../model/Motorista')
-const Viagem = require('../model/Viagem')
+const Veiculo = require('../models').veiculo
+const Motorista = require('../models').motorista
+const Viagem = require('../models').viagem
 
 const router = express.Router()
+
+const convertViagem = viagem => {
+    const vi = {
+        id: viagem.dataValues.id,
+        saida: viagem.dataValues.saida,
+        km_inicial: viagem.dataValues.km_inicial,
+        chegada: viagem.dataValues.chegada,
+        km_final: viagem.dataValues.km_final,
+        descricao: viagem.dataValues.descricao,
+        veiculo: {
+            ...viagem.dataValues.veiculo.dataValues
+        },
+        motorista: {
+            ...viagem.dataValues.motoristum.dataValues
+        }
+    }
+    delete vi.motorista.senha
+    return vi
+}
 
 router.get('/', check_auth, (req, res, next) => {
 
@@ -87,27 +106,35 @@ router.get('/', check_auth, (req, res, next) => {
             })
         })
     } else {
-        Viagem.findAll()
+        Viagem.findAll({
+            include: [Veiculo, Motorista]
+        })
         .then(viagens => {
-            return res.status(HttpStatus.OK).json(viagens)
+            const result = viagens.map(viagem => {
+                return convertViagem(viagem)
+            })
+            return res.status(HttpStatus.OK).json(result)
         })
         .catch(err => {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                mensagem: 'Erro interno no servidor'
+                mensagem: err
             })
         })
     }    
 })
 
-router.get('/:viagemId', check_auth, (req, res, next) => {
-    Viagem.findByPk(req.params.viagemId)
+router.get('/:viagemId', check_auth, async (req, res, next) => {
+
+    Viagem.findByPk(req.params.viagemId, { 
+        include: [Veiculo, Motorista] 
+    })
     .then(viagem => {
         if (!viagem) {
             return res.status(HttpStatus.NOT_FOUND).json({
                 mensagem: 'Viagem não encontrada'
             })
         }
-        res.status(HttpStatus.OK).json(viagem)
+        res.status(HttpStatus.OK).json(convertViagem(viagem))
     })
     .catch(err => {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

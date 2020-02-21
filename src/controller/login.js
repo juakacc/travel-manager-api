@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-const Motorista = require('../model/Motorista')
+const Motorista = require('../models').motorista
 
 const router = express.Router()
 

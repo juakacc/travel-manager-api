@@ -1,5 +1,5 @@
 const express = require('express')
-const Veiculo = require('../model/Veiculo')
+const Veiculo = require('../models').veiculo
 const HttpStatus = require('http-status-codes')
 const check_auth = require('../middleware/check_auth')
 

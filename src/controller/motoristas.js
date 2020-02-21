@@ -1,5 +1,5 @@
 const express = require('express')
-const Motorista = require('../model/Motorista')
+const Motorista = require('../models').motorista
 const HttpStatus = require('http-status-codes')
 const bcrypt = require('bcryptjs')
 const check_auth = require('../middleware/check_auth')
@@ -9,8 +9,8 @@ const router = express.Router()
 router.get('/', check_auth, (req, res, next) => {
     Motorista.findAll()
     .then(motoristas => {
-        const result = motoristas.map(motorista => {           
-            motorista.senha = ''
+        const result = motoristas.map(motorista => {
+            delete motorista.dataValues.senha
             return motorista
         })
         res.status(HttpStatus.OK).json(result)

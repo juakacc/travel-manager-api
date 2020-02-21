@@ -1,6 +1,7 @@
-SECRET_KEY_TOKEN=T
+SECRET_KEY_TOKEN=para_encriptar_o_jwt
 
-LOCAL_DB=A
-DATABASE_DB=B
-USERNAME_DB=C
-PASSWORD_DB=D
+LOCAL_DB=endereco_do_banco
+DATABASE_DB=nome_do_banco
+USERNAME_DB=usuario_do_banco
+PASSWORD_DB=senha_do_usuario
+NODE_ENV=[production, development]
