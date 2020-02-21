@@ -43,10 +43,14 @@ router.get('/', check_auth, (req, res, next) => {
                         chegada: {
                             [Op.not]: null
                         }
-                    }
+                    },
+                    include: [Veiculo, Motorista]
                 })
                 .then(viagens => {
-                    return res.status(HttpStatus.OK).json(viagens)
+                    const result = viagens.map(viagem => {
+                        return convertViagem(viagem)
+                    })
+                    return res.status(HttpStatus.OK).json(result)
                 })
                 .catch(err => {
                     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -60,10 +64,14 @@ router.get('/', check_auth, (req, res, next) => {
                         chegada: {
                             [Op.is]: null
                         }        
-                    }
+                    },
+                    include: [Veiculo, Motorista]
                 })
                 .then(viagens => {
-                    return res.status(HttpStatus.OK).json(viagens)
+                    const result = viagens.map(viagem => {
+                        return convertViagem(viagem)
+                    })
+                    return res.status(HttpStatus.OK).json(result)
                 })
                 .catch(err => {
                     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -81,24 +89,30 @@ router.get('/', check_auth, (req, res, next) => {
             where: {
                 [Op.or]: {
                     [Op.and]: {
-                        chegada: null,
+                        chegada: {
+                            [Op.is]: null
+                        },
                         saida: {
-                            lte: date
+                            [Op.lte]: date
                         }
                     },
                     [Op.and]: {
                         saida: {
-                            lte: date
+                            [Op.lte]: date
                         },
                         chegada: {
-                            gte: date
+                            [Op.gte]: date
                         }
                     }                    
                 }
-            }
+            },
+            include: [Veiculo, Motorista]
         })
         .then(viagens => {
-            return res.status(HttpStatus.OK).json(viagens)
+            const result = viagens.map(viagem => {
+                return convertViagem(viagem)
+            })
+            return res.status(HttpStatus.OK).json(result)
         })
         .catch(err => {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -156,14 +170,14 @@ router.get('/atual/:motoristaId', check_auth, (req, res, next) => {
     })
     .then(viagens => {
         if (viagens.length == 0) {
-            res.status(HttpStatus.NOT_FOUND).json({
+            return res.status(HttpStatus.NOT_FOUND).json({
                 mensagem: 'Viagem não encontrada'
             })
         }
-        res.status(HttpStatus.OK).json(viagens[0])
+        return res.status(HttpStatus.OK).json(viagens[0])
     })
     .catch(err => {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             mensagem: 'Ocorreu um erro interno no servidor'
         })
     })
