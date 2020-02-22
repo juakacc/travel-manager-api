@@ -85,26 +85,24 @@ router.get('/', check_auth, (req, res, next) => {
                 })
         }
     } else if (date) {
+
         Viagem.findAll({
             where: {
-                [Op.or]: {
-                    [Op.and]: {
-                        chegada: {
-                            [Op.is]: null
-                        },
+                [Op.and]: [{
                         saida: {
                             [Op.lte]: date
                         }
-                    },
-                    [Op.and]: {
-                        saida: {
-                            [Op.lte]: date
-                        },
-                        chegada: {
-                            [Op.gte]: date
-                        }
-                    }                    
-                }
+                    }, {
+                        [Op.or]: [{
+                            chegada: {
+                                [Op.is]: null
+                            }
+                        }, {
+                            chegada: {
+                                [Op.gte]: date
+                            }
+                        }]
+                    }]
             },
             include: [Veiculo, Motorista]
         })
@@ -166,7 +164,8 @@ router.get('/atual/:motoristaId', check_auth, (req, res, next) => {
             chegada: {
                 [Op.is]: null
             }
-        }
+        },
+        include: [Veiculo, Motorista] 
     })
     .then(viagens => {
         if (viagens.length == 0) {
@@ -174,7 +173,7 @@ router.get('/atual/:motoristaId', check_auth, (req, res, next) => {
                 mensagem: 'Viagem não encontrada'
             })
         }
-        return res.status(HttpStatus.OK).json(viagens[0])
+        return res.status(HttpStatus.OK).json(convertViagem(viagens[0]))
     })
     .catch(err => {
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -185,9 +184,9 @@ router.get('/atual/:motoristaId', check_auth, (req, res, next) => {
 
 const checkCNH = (motorista, veiculo) => {
 
-    if (motorista === veiculo) return true;
+    if (motorista == veiculo) return true;
 		
-    if (!motorista || !veiculo) return false;
+    if (motorista == null || veiculo == null) return false;
     
     switch (veiculo) {
         case 'A':
@@ -206,11 +205,7 @@ const checkCNH = (motorista, veiculo) => {
 }
 
 router.post('/', check_auth, async (req, res, next) => {
-
-    const { saida, km_inicial, descricao } = req.body
-
-    const veiculo = req.body.veiculo.id
-    const motorista = req.body.motorista.id
+    const { saida, km_inicial, descricao, veiculo, motorista } = req.body
 
     const veiculoBD = await Veiculo.findByPk(veiculo)
     if (!veiculoBD) {
@@ -236,7 +231,7 @@ router.post('/', check_auth, async (req, res, next) => {
         })
     }
 
-    if (!checkCNH(motoristaBD.dataValues.cnh, veiculoBD.dataValues.cnh_requerida)) {
+    if (!checkCNH(motoristaBD.dataValues.categoria, veiculoBD.dataValues.cnh_requerida)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
             mensagem: 'CNH incompatível com o modelo do veículo'
         })
@@ -258,7 +253,17 @@ router.post('/', check_auth, async (req, res, next) => {
             disponivel: false
         }, { where: { id: motorista } })
 
-        return res.status(HttpStatus.CREATED).json(viagem)
+        console.log(viagem)
+
+        const result = {
+            id: viagem.id,
+            saida: viagem.saida,
+            km_inicial: viagem.km_inicial,
+            descricao: viagem.descricao,
+            veiculo: viagem.id_veiculo,
+            motorista: viagem.id_motorista
+        }
+        return res.status(HttpStatus.CREATED).json(result)
     })
     .catch(err => {
         return res.status(HttpStatus.BAD_REQUEST).json({
