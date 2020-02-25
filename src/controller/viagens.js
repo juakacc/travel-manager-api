@@ -45,7 +45,8 @@ router.get('/', check_auth, (req, res, next) => {
                         }
                     },
                     include: [Veiculo, Motorista],
-                    limit: 5
+                    limit: 5,
+                    order: [['chegada', 'DESC']]
                 })
                 .then(viagens => {
                     const result = viagens.map(viagem => {
@@ -66,7 +67,8 @@ router.get('/', check_auth, (req, res, next) => {
                             [Op.is]: null
                         }        
                     },
-                    include: [Veiculo, Motorista]
+                    include: [Veiculo, Motorista],
+                    order: [['saida', 'DESC']]
                 })
                 .then(viagens => {
                     const result = viagens.map(viagem => {
