@@ -9,8 +9,11 @@ const check = (req, res, next) => {
         req.userData = decodificado
         next()
     } catch (erro) {
+        const tokenExpirado = erro.name === 'TokenExpiredError'
+
         return res.status(HttpStatus.UNAUTHORIZED).json({
             mensagem: 'Sem permissão para acesso',
+            tokenExpirado,
             erro
         })
     }

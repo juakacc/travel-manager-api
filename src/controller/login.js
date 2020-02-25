@@ -34,6 +34,7 @@ router.post('/', (req, res, next) => {
             apelido: motorista.apelido
         }, process.env.SECRET_KEY_TOKEN, {
             expiresIn: '30days'
+            // expiresIn: '1min'
         })
 
         return res.status(HttpStatus.OK).json({

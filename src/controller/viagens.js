@@ -44,7 +44,8 @@ router.get('/', check_auth, (req, res, next) => {
                             [Op.not]: null
                         }
                     },
-                    include: [Veiculo, Motorista]
+                    include: [Veiculo, Motorista],
+                    limit: 5
                 })
                 .then(viagens => {
                     const result = viagens.map(viagem => {
@@ -119,7 +120,8 @@ router.get('/', check_auth, (req, res, next) => {
         })
     } else {
         Viagem.findAll({
-            include: [Veiculo, Motorista]
+            include: [Veiculo, Motorista],
+            limit: 5
         })
         .then(viagens => {
             const result = viagens.map(viagem => {
@@ -233,7 +235,7 @@ router.post('/', check_auth, async (req, res, next) => {
 
     if (!checkCNH(motoristaBD.dataValues.categoria, veiculoBD.dataValues.cnh_requerida)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: 'CNH incompatível com o modelo do veículo'
+            mensagem: 'CNH incompatível com a requerida pelo veículo'
         })
     }
 
@@ -252,8 +254,6 @@ router.post('/', check_auth, async (req, res, next) => {
         Motorista.update({
             disponivel: false
         }, { where: { id: motorista } })
-
-        console.log(viagem)
 
         const result = {
             id: viagem.id,
