@@ -44,26 +44,54 @@ router.get('/:motoristaId', check_auth, (req, res, next) => {
     })
 })
 
-router.post('/', (req, res, next) => {
-    const salt = bcrypt.genSaltSync(10)
-    const senha = bcrypt.hashSync(req.body.senha, salt)
+router.post('/', async (req, res, next) => {
 
-    // validar categoria
+    const { nome, apelido, cnh, categoria, telefone, senha } = req.body
+
+    const salt = bcrypt.genSaltSync(10)
+    const senhaEnc = bcrypt.hashSync(senha, salt)
+
+    const cat = categoria.toUpperCase()
+
+    if (!['A', 'B', 'C', 'D', 'E', 'AB', 'AC', 'AD', 'AE'].includes(cat)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Categoria da CNH inválida'
+        })
+    }
+
+    const motorista = await Motorista.findAll({
+        where: { apelido }
+    })
+    if (motorista.length > 0) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Apelido já cadastrado'
+        })
+    }
+
+    const motorista2 = await Motorista.findAll({
+        where: { cnh }
+    })
+    if (motorista2.length > 0) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Não é permitido CNH duplicada'
+        })
+    }   
 
     Motorista.create({
-        nome: req.body.nome,
-        apelido: req.body.apelido.toLowerCase(),
-        cnh: req.body.cnh,
-        categoria: req.body.categoria,
-        telefone: req.body.telefone,
-        senha: senha
+        nome,
+        apelido: apelido.toLowerCase(),
+        cnh,
+        categoria: cat,
+        telefone,
+        senha: senhaEnc
     })
     .then(motorista => {
         delete motorista.dataValues.senha
-        res.status(HttpStatus.CREATED).json(motorista.dataValues)    
+        return res.status(HttpStatus.CREATED).json(motorista.dataValues)    
     })
     .catch(err => {
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        console.log(err)
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             mensagem: 'Erro interno do servidor'
         })
     })
@@ -84,7 +112,5 @@ router.delete('/:motoristaId', check_auth, (req, res, next) => {
         })
     })
 })
-
-// /dados/{apelido} enviar dados no token
 
 module.exports = router

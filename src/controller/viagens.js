@@ -286,6 +286,13 @@ router.put('/:viagemId', check_auth, async (req, res, next) => {
 
     const { saida, chegada, km_inicial, km_final, descricao, veiculo, motorista } = req.body
 
+    if (km_final < km_inicial) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: `KM final (${km_final}Km) não pode ser menor que KM inicial (${km_inicial}Km)`
+        })
+    }
+    // verificar data de saida e chegada chegada < saida
+
     // Validar informações
 
     Viagem.update({
