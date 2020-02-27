@@ -48,14 +48,34 @@ router.post('/', async (req, res, next) => {
 
     const { nome, apelido, cnh, categoria, telefone, senha } = req.body
 
-    const salt = bcrypt.genSaltSync(10)
-    const senhaEnc = bcrypt.hashSync(senha, salt)
+    if ('' === nome.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Nome inválido'
+        })
+    }
+
+    if ('' === apelido.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Apelido inválido'
+        })
+    }
+
+    if ('' === senha.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Senha inválida'
+        })
+    }
+
+    if ('' === telefone.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Telefone inválido'
+        })
+    }
 
     const cat = categoria.toUpperCase()
-
     if (!['A', 'B', 'C', 'D', 'E', 'AB', 'AC', 'AD', 'AE'].includes(cat)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: 'Categoria da CNH inválida'
+            mensagem: 'Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]'
         })
     }
 
@@ -76,6 +96,9 @@ router.post('/', async (req, res, next) => {
             mensagem: 'Não é permitido CNH duplicada'
         })
     }   
+
+    const salt = bcrypt.genSaltSync(10)
+    const senhaEnc = bcrypt.hashSync(senha, salt)
 
     Motorista.create({
         nome,

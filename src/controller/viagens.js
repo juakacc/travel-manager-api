@@ -276,29 +276,36 @@ router.post('/', check_auth, async (req, res, next) => {
 
 router.put('/:viagemId', check_auth, async (req, res, next) => {
     const { viagemId } = req.params
+    const { saida, chegada, km_inicial, km_final, descricao, veiculo, motorista } = req.body
 
     const viagem = await Viagem.findByPk(viagemId)
     if (!viagem) {
         return res.status(HttpStatus.BAD_REQUEST).json({
             mensagem: 'Viagem não encontrada'
         })
-    }
-
-    const { saida, chegada, km_inicial, km_final, descricao, veiculo, motorista } = req.body
+    }  
 
     if (km_final < km_inicial) {
         return res.status(HttpStatus.BAD_REQUEST).json({
             mensagem: `KM final (${km_final}Km) não pode ser menor que KM inicial (${km_inicial}Km)`
         })
     }
-    // verificar data de saida e chegada chegada < saida
+
+    const dataSaida = new Date(saida)
+    const dataChegada = new Date(chegada)
+
+    if (dataChegada < dataSaida) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Data de chegada anterior a data de saída'
+        })
+    }
 
     // Validar informações
 
     Viagem.update({
-        saida,
+        saida, // verificar se vai poder atualizar
         chegada, 
-        km_inicial,
+        km_inicial, // verificar se vai poder atualizar
         km_final,
         descricao,
         // id_veiculo: veiculo,

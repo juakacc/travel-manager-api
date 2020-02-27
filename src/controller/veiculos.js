@@ -39,11 +39,12 @@ router.get('/:veiculoId', check_auth, (req, res, next) => {
     Veiculo.findByPk(id)
     .then(veiculo => {
         if (veiculo == null) {
-            res.status(HttpStatus.NOT_FOUND).json({
+            return res.status(HttpStatus.NOT_FOUND).json({
                 mensagem: 'Veiculo não encontrado'
             })
-        }
-        res.status(HttpStatus.OK).json(veiculo)
+        } else {
+            return res.status(HttpStatus.OK).json(veiculo.dataValues)
+        }        
     })
     .catch(err => {
         console.log(err)
@@ -54,7 +55,54 @@ router.get('/:veiculoId', check_auth, (req, res, next) => {
 })
 
 router.post('/', check_auth, (req, res, next) => {
-    Veiculo.create(req.body)
+
+    const { nome, placa, renavam, marca, modelo, cnh_requerida } = req.body
+
+    if ('' === nome.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Nome inválido'
+        })
+    }
+
+    if ('' === placa.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Placa inválida'
+        })
+    }
+
+    if ('' === renavam.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Renavam inválido'
+        })
+    }
+
+    if ('' === marca.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Marca inválida'
+        })
+    }
+
+    if ('' === modelo.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Modelo inválido'
+        })
+    }
+
+    const cat = cnh_requerida.toUpperCase()
+    if (!['A', 'B', 'C', 'D', 'E', 'AB', 'AC', 'AD', 'AE'].includes(cat)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]'
+        })
+    }
+
+    Veiculo.create({
+        nome,
+        placa,
+        renavam,
+        marca,
+        modelo,
+        cnh_requerida: cat
+    })
     .then(veiculo => {
         res.status(HttpStatus.CREATED).json(veiculo.dataValues)
     })
