@@ -120,6 +120,102 @@ router.post('/', async (req, res, next) => {
     })
 })
 
+router.put('/:motoristaId', async (req, res, next) => {
+
+    const id = req.params.motoristaId
+    const { nome, apelido, cnh, categoria, telefone, senha } = req.body
+
+    const motoristaBD = await Motorista.findByPk(id)
+    if (!motoristaBD) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Motorista não encontrado'
+        })
+    }  
+
+    if ('' === nome.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Nome inválido'
+        })
+    }
+
+    if ('' === apelido.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Apelido inválido'
+        })
+    }
+
+    if ('' === senha.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Senha inválida'
+        })
+    }
+
+    if ('' === telefone.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Telefone inválido'
+        })
+    }
+
+    const cat = categoria.toUpperCase()
+    if (!['A', 'B', 'C', 'D', 'E', 'AB', 'AC', 'AD', 'AE'].includes(cat)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]'
+        })
+    }
+
+    // VERIFICAR DESCONSIDERANDO ELE
+    // const motorista = await Motorista.findAll({
+    //     where: { apelido }
+    // })
+    // if (motorista.length > 0) {
+    //     return res.status(HttpStatus.BAD_REQUEST).json({
+    //         mensagem: 'Apelido já cadastrado'
+    //     })
+    // }
+
+    // const motorista2 = await Motorista.findAll({
+    //     where: { cnh }
+    // })
+    // if (motorista2.length > 0) {
+    //     return res.status(HttpStatus.BAD_REQUEST).json({
+    //         mensagem: 'Não é permitido CNH duplicada'
+    //     })
+    // }   
+
+    const salt = bcrypt.genSaltSync(10)
+    const senhaEnc = bcrypt.hashSync(senha, salt)
+
+    Motorista.update({
+        nome,
+        apelido: apelido.toLowerCase(),
+        cnh,
+        categoria: cat,
+        telefone,
+        senha: senhaEnc
+    }, {
+        where: { id }
+    })
+    .then(motorista2 => {
+        Motorista.findByPk(id)
+        .then(motorista2 => {
+            delete motorista2.dataValues.senha
+            return res.status(HttpStatus.OK).json(motorista2.dataValues)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                mensagem: err
+            })
+        })            
+    })
+    .catch(err => {
+        console.log(err)
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            mensagem: 'Erro interno do servidor'
+        })
+    })
+})
+
 router.delete('/:motoristaId', check_auth, (req, res, next) => {
     const id = req.params.motoristaId
 
