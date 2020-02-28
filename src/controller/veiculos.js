@@ -54,8 +54,77 @@ router.get('/:veiculoId', check_auth, (req, res, next) => {
     })
 })
 
-router.post('/', check_auth, (req, res, next) => {
+router.post('/', check_auth, async (req, res, next) => {
 
+    const { nome, placa, renavam, marca, modelo, quilometragem, cnh_requerida } = req.body
+
+    if ('' === nome.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Nome inválido'
+        })
+    }
+
+    if ('' === placa.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Placa inválida'
+        })
+    }
+
+    if ('' === renavam.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Renavam inválido'
+        })
+    }
+
+    if ('' === marca.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Marca inválida'
+        })
+    }
+
+    if ('' === modelo.trim()) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Modelo inválido'
+        })
+    }
+
+    const cat = cnh_requerida.toUpperCase()
+    if (!['A', 'B', 'C', 'D', 'E', 'AB', 'AC', 'AD', 'AE'].includes(cat)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]'
+        })
+    }
+
+    const veiculo1 = await Veiculo.findAll({
+        where: { placa }
+    })
+    if (veiculo1.length > 0) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'A placa informada já está cadastrada'
+        })
+    }
+
+    Veiculo.create({
+        nome,
+        placa,
+        renavam,
+        marca,
+        modelo,
+        quilometragem,
+        cnh_requerida: cat
+    })
+    .then(veiculo => {
+        res.status(HttpStatus.CREATED).json(veiculo.dataValues)
+    })
+    .catch(err => {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            mensagem: err
+        })
+    })
+})
+
+router.put('/:veiculoId', check_auth, async (req, res, next) => {
+    const id = req.params.veiculoId
     const { nome, placa, renavam, marca, modelo, cnh_requerida } = req.body
 
     if ('' === nome.trim()) {
@@ -95,7 +164,18 @@ router.post('/', check_auth, (req, res, next) => {
         })
     }
 
-    Veiculo.create({
+    const veiculo1 = await Veiculo.findAll({
+        where: { placa }
+    })
+    if (veiculo1.length > 0) {
+        if (veiculo1[0].id != id) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                mensagem: 'A placa informada já está cadastrada'
+            })
+        }
+    }
+
+    Veiculo.update({
         nome,
         placa,
         renavam,
