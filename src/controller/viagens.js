@@ -313,7 +313,8 @@ router.put('/:viagemId', check_auth, async (req, res, next) => {
     }, { where: { id: viagemId } })
     .then(viagem => {
         Veiculo.update({
-            disponivel: true
+            disponivel: true,
+            quilometragem: km_final
         }, { where: { id: veiculo } })
 
         Motorista.update({

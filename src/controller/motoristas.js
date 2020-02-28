@@ -84,7 +84,7 @@ router.post('/', async (req, res, next) => {
     })
     if (motorista.length > 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: 'Apelido já cadastrado'
+            mensagem: 'O apelido já está em usos'
         })
     }
 
@@ -93,7 +93,7 @@ router.post('/', async (req, res, next) => {
     })
     if (motorista2.length > 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: 'Não é permitido CNH duplicada'
+            mensagem: 'A CNH informada já está cadastrada'
         })
     }   
 
@@ -163,24 +163,27 @@ router.put('/:motoristaId', async (req, res, next) => {
         })
     }
 
-    // VERIFICAR DESCONSIDERANDO ELE
-    // const motorista = await Motorista.findAll({
-    //     where: { apelido }
-    // })
-    // if (motorista.length > 0) {
-    //     return res.status(HttpStatus.BAD_REQUEST).json({
-    //         mensagem: 'Apelido já cadastrado'
-    //     })
-    // }
+    const motorista = await Motorista.findAll({
+        where: { apelido }
+    })
+    if (motorista.length > 0) {
+        if (motorista[0].id != id) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                mensagem: 'O apelido já está em uso'
+            })
+        }
+    }
 
-    // const motorista2 = await Motorista.findAll({
-    //     where: { cnh }
-    // })
-    // if (motorista2.length > 0) {
-    //     return res.status(HttpStatus.BAD_REQUEST).json({
-    //         mensagem: 'Não é permitido CNH duplicada'
-    //     })
-    // }   
+    const motorista2 = await Motorista.findAll({
+        where: { cnh }
+    })
+    if (motorista2.length > 0) {
+        if (motorista2[0].id != id) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                mensagem: 'A CNH informada já está em uso'
+            })
+        }
+    }   
 
     const salt = bcrypt.genSaltSync(10)
     const senhaEnc = bcrypt.hashSync(senha, salt)
