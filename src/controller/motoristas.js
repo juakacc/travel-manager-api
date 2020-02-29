@@ -84,7 +84,7 @@ router.post('/', async (req, res, next) => {
     })
     if (motorista.length > 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: 'O apelido já está em usos'
+            mensagem: 'O apelido já está em uso'
         })
     }
 
@@ -123,7 +123,7 @@ router.post('/', async (req, res, next) => {
 router.put('/:motoristaId', async (req, res, next) => {
 
     const id = req.params.motoristaId
-    const { nome, apelido, cnh, categoria, telefone, senha } = req.body
+    const { nome, apelido, cnh, categoria, telefone } = req.body
 
     const motoristaBD = await Motorista.findByPk(id)
     if (!motoristaBD) {
@@ -141,12 +141,6 @@ router.put('/:motoristaId', async (req, res, next) => {
     if ('' === apelido.trim()) {
         return res.status(HttpStatus.BAD_REQUEST).json({
             mensagem: 'Apelido inválido'
-        })
-    }
-
-    if ('' === senha.trim()) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: 'Senha inválida'
         })
     }
 
@@ -183,22 +177,18 @@ router.put('/:motoristaId', async (req, res, next) => {
                 mensagem: 'A CNH informada já está em uso'
             })
         }
-    }   
-
-    const salt = bcrypt.genSaltSync(10)
-    const senhaEnc = bcrypt.hashSync(senha, salt)
+    }
 
     Motorista.update({
         nome,
         apelido: apelido.toLowerCase(),
         cnh,
         categoria: cat,
-        telefone,
-        senha: senhaEnc
+        telefone
     }, {
         where: { id }
     })
-    .then(motorista2 => {
+    .then(() => {
         Motorista.findByPk(id)
         .then(motorista2 => {
             delete motorista2.dataValues.senha
@@ -207,7 +197,7 @@ router.put('/:motoristaId', async (req, res, next) => {
         .catch(err => {
             console.log(err)
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                mensagem: err
+                mensagem: 'Erro interno no servidor'
             })
         })            
     })

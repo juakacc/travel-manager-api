@@ -125,7 +125,14 @@ router.post('/', check_auth, async (req, res, next) => {
 
 router.put('/:veiculoId', check_auth, async (req, res, next) => {
     const id = req.params.veiculoId
-    const { nome, placa, renavam, marca, modelo, cnh_requerida } = req.body
+    const { nome, placa, renavam, marca, modelo, quilometragem, cnh_requerida } = req.body
+
+    const veiculoBD = await Veiculo.findByPk(id)
+    if (!veiculoBD) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            mensagem: 'Veículo não encontrado'
+        })
+    }
 
     if ('' === nome.trim()) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -181,14 +188,27 @@ router.put('/:veiculoId', check_auth, async (req, res, next) => {
         renavam,
         marca,
         modelo,
+        quilometragem,
         cnh_requerida: cat
+    }, {
+        where: { id }
     })
-    .then(veiculo => {
-        res.status(HttpStatus.CREATED).json(veiculo.dataValues)
+    .then(result => {
+        Veiculo.findByPk(id)
+        .then(veiculo => {
+            res.status(HttpStatus.OK).json(veiculo.dataValues)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                mensagem: 'Erro interno do servidor'
+            })
+        })        
     })
     .catch(err => {
+        console.log(err)
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            mensagem: err
+            mensagem: 'Erro interno do servidor'
         })
     })
 })
