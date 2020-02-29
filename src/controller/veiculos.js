@@ -88,6 +88,15 @@ router.post('/', check_auth, async (req, res, next) => {
         })
     }
 
+    if (quilometragem) {    // VALIDAR
+        if (isNaN(quilometragem)) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                mensagem: 'Valor para quilometragem inválido'
+            })
+        }
+    }
+    const km = quilometragem ? quilometragem : 0
+
     const cat = cnh_requerida.toUpperCase()
     if (!['A', 'B', 'C', 'D', 'E', 'AB', 'AC', 'AD', 'AE'].includes(cat)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -110,13 +119,14 @@ router.post('/', check_auth, async (req, res, next) => {
         renavam,
         marca,
         modelo,
-        quilometragem,
+        quilometragem: km,
         cnh_requerida: cat
     })
     .then(veiculo => {
         res.status(HttpStatus.CREATED).json(veiculo.dataValues)
     })
     .catch(err => {
+        console.log(err)
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             mensagem: err
         })
@@ -164,6 +174,15 @@ router.put('/:veiculoId', check_auth, async (req, res, next) => {
         })
     }
 
+    if (quilometragem) {    // VALIDAR
+        if (isNaN(quilometragem)) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                mensagem: 'Valor para quilometragem inválido'
+            })
+        }
+    }
+    const km = quilometragem ? quilometragem : null
+
     const cat = cnh_requerida.toUpperCase()
     if (!['A', 'B', 'C', 'D', 'E', 'AB', 'AC', 'AD', 'AE'].includes(cat)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -182,18 +201,25 @@ router.put('/:veiculoId', check_auth, async (req, res, next) => {
         }
     }
 
-    Veiculo.update({
+    const veic = {
         nome,
         placa,
         renavam,
         marca,
         modelo,
-        quilometragem,
+        quilometragem: km,
         cnh_requerida: cat
+    }
+    if (!veic.quilometragem) {
+        delete veic.quilometragem
+    }
+
+    Veiculo.update({
+        ...veic
     }, {
         where: { id }
     })
-    .then(result => {
+    .then(() => {
         Veiculo.findByPk(id)
         .then(veiculo => {
             res.status(HttpStatus.OK).json(veiculo.dataValues)
