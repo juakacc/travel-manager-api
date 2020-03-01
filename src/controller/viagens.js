@@ -284,7 +284,7 @@ router.put('/:viagemId', check_auth, async (req, res, next) => {
             mensagem: 'Viagem não encontrada'
         })
     }  
-
+    console.log(`KM FINAL: ${km_final}, KM INICIAL: ${km_inicial}`)
     if (km_final < km_inicial) {
         return res.status(HttpStatus.BAD_REQUEST).json({
             mensagem: `KM final (${km_final}Km) não pode ser menor que KM inicial (${km_inicial}Km)`
