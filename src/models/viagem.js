@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     id_motorista: DataTypes.INTEGER,
   }, {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: true,
+    underscored: true
   });
   viagem.associate = function(models) {
     viagem.belongsTo(models.veiculo, {

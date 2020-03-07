@@ -1,17 +1,17 @@
 const express = require('express')
 const check_auth = require('../middleware/check_auth')
 const motoristas = require('../service/motoristas')
-
+const constantes = require('../constantes')
 const router = express.Router()
 
-router.get('/', check_auth, motoristas.get_all)
+router.get('/', (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA), motoristas.get_all)
 
-router.get('/:motoristaId', check_auth, motoristas.get_by_id)
+router.get('/:motoristaId', (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA), motoristas.get_by_id)
 
-router.post('/', motoristas.salvar)
+router.post('/', (req, res, next) => check_auth(req, res, next, constantes.ADMIN), motoristas.salvar)
 
-router.put('/:motoristaId', motoristas.editar)
+router.put('/:motoristaId', (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA), motoristas.editar)
 
-router.delete('/:motoristaId', check_auth, motoristas.deletar)
+router.delete('/:motoristaId', (req, res, next) => check_auth(req, res, next, constantes.ADMIN), motoristas.deletar)
 
 module.exports = router
