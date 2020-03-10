@@ -24,7 +24,7 @@ module.exports = {
 
             queryInterface.bulkInsert('auth_permissoes', [{
                 id_motorista: 1,    // ADMIN
-                id_permissao: 1     // admin
+                permissao: 'admin'     // admin
             }], { transaction: t })
           ])
       })

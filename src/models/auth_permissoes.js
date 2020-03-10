@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const auth_permissoes = sequelize.define('auth_permissoes', {
     id_motorista: DataTypes.INTEGER,
-    id_permissao: DataTypes.INTEGER
+    permissao: DataTypes.INTEGER
   }, {
       timestamps: false,
       underscored: true,
@@ -10,10 +10,11 @@ module.exports = (sequelize, DataTypes) => {
   })
   auth_permissoes.associate = function(models) {
     auth_permissoes.belongsTo(models.motorista, {
-        foreignKey: 'id_motorista'
+        foreignKey: 'id_motorista',
+        onDelete: 'CASCADE'
     })
     auth_permissoes.belongsTo(models.auth_papeis, {
-        foreignKey: 'id_permissao'
+        foreignKey: 'permissao'
     })
   }
   auth_permissoes.removeAttribute('id')

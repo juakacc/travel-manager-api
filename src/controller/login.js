@@ -25,7 +25,7 @@ router.post('/', (req, res, next) => {
 
         if (!bcrypt.compareSync(senha, motorista.senha)) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                mensagem: 'Senha incorreta'
+                mensagem: 'Login e senha não correspondem'
             })
         }
 

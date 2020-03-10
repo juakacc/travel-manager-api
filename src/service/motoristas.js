@@ -1,6 +1,8 @@
 const Motorista = require('../models').motorista
+const Permissao = require('../models').auth_permissoes
 const HttpStatus = require('http-status-codes')
 const bcrypt = require('bcryptjs')
+const constantes = require('../constantes')
 
 exports.get_all = (req, res, next) => {
     Motorista.findAll()
@@ -41,8 +43,7 @@ exports.get_by_id = (req, res, next) => {
 }
 
 exports.salvar = async (req, res, next) => {
-
-    const { nome, apelido, cnh, categoria, telefone, senha } = req.body
+    const { nome, apelido, cnh, categoria, telefone, senha, permissoes } = req.body
 
     if ('' === nome.trim()) {
         return res.status(HttpStatus.BAD_REQUEST).json({
@@ -106,6 +107,17 @@ exports.salvar = async (req, res, next) => {
     })
     .then(motorista => {
         delete motorista.dataValues.senha
+
+        Permissao.create({  // padrao
+            id_motorista: motorista.id,
+            permissao: constantes.MOTORISTA
+        })
+        if (permissoes && permissoes.admin) {
+            Permissao.create({
+                id_motorista: motorista.id,
+                permissao: constantes.ADMIN
+            })
+        }
         return res.status(HttpStatus.CREATED).json(motorista.dataValues)    
     })
     .catch(err => {

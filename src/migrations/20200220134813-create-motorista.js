@@ -43,36 +43,32 @@ module.exports = {
             }, { transaction: t }),
 
             queryInterface.createTable('auth_papeis', {
-                id: {
-                  allowNull: false,
-                  autoIncrement: true,
-                  primaryKey: true,
-                  type: Sequelize.INTEGER
-                },
                 nome: {
                   type: Sequelize.STRING,
-                  unique: true
+                  allowNull: false,
+                  primaryKey: true
                 }
-              }, { transaction: t }),
+            }, { transaction: t }),
 
-              queryInterface.createTable('auth_permissoes', {
+            queryInterface.createTable('auth_permissoes', {
                 id_motorista: {
                     type: Sequelize.INTEGER,
                     allowNull: false,
+                    onDelete: 'CASCADE',
                     references: {
                         model: 'motorista',
                         key: 'id'
                     }
                 },
-                id_permissao: {
-                    type: Sequelize.INTEGER,
+                permissao: {
+                    type: Sequelize.STRING,
                     allowNull: false,
                     references: {
                         model: 'auth_papeis',
-                        key: 'id'
+                        key: 'nome'
                     }
                 }
-              }, { transaction: t })
+            }, { transaction: t })
         ]);
     })
   },

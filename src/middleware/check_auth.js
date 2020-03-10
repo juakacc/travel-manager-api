@@ -2,14 +2,15 @@ const HttpStatus = require('http-status-codes')
 const jwt = require('jsonwebtoken')
 const Permissao = require('../models').auth_permissoes
 const Papel = require('../models').auth_papeis
+const constantes = require('../constantes')
 require('dotenv').config()
 
-const check = (req, res, next, role) => {
+const check = async (req, res, next, role) => {
     try {
         const token = req.headers.authorization.split(' ')[1]
         const decodificado = jwt.verify(token, process.env.SECRET_KEY_TOKEN)
         const id_motorista = decodificado.id
-        
+
         Permissao.findAll({
             where: { id_motorista },
             include: [Papel]
@@ -18,21 +19,27 @@ const check = (req, res, next, role) => {
             const permissoes = p.map(item => {
                 return item.dataValues.auth_papei.dataValues.nome
             })
-            if (permissoes.includes(role)) {
+            if (permissoes.length == 0) {
+                permissoes.push(constantes.MOTORISTA)
+            }
+            console.log('Permissões do usuário:', permissoes)
+            if (permissoes.includes(role) || permissoes.includes(constantes.ADMIN)) { // ADMIN > MOTORISTA
                 req.userData = decodificado
+                req.userData.roles = permissoes // adicionando roles na requisição
                 next()        
             } else {
                 return res.status(HttpStatus.UNAUTHORIZED).json({
-                    mensagem: 'Ausência de permissão',
+                    mensagem: 'Você não tem permissão para realizar essa ação!',
                     tokenExpirado : false
                 })
             }
         })
         .catch(err => {
             console.error(err)
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                mensagem: 'Erro interno no servidor',
-                tokenExpirado : false
+            return res.status(HttpStatus.UNAUTHORIZED).json({
+                mensagem: 'Erro na validação',
+                tokenExpirado,
+                erro
             })
         })        
     } catch (erro) {
