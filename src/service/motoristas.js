@@ -31,8 +31,22 @@ exports.get_by_id = (req, res, next) => {
                 mensagem: 'Motorista não encontrado'
             })
         } else {
-            delete motorista.dataValues.senha
-            res.status(HttpStatus.OK).json(motorista.dataValues)
+            Permissao.findAll({
+                where: { id_motorista: id }
+            })
+            .then(per => {
+                const permissoes = per.map(item => {
+                    return item.dataValues.permissao
+                })
+                motorista.dataValues.permissoes = permissoes.length > 0 ? permissoes : [constantes.MOTORISTA]
+                delete motorista.dataValues.senha
+                res.status(HttpStatus.OK).json(motorista.dataValues)
+            })
+            .catch(err => {
+                console.log(err)
+                delete motorista.dataValues.senha
+                res.status(HttpStatus.OK).json(motorista.dataValues)
+            })            
         }
     })
     .catch(err => {
