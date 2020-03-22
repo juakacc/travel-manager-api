@@ -6,12 +6,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true
     }
   }, {
-    timestamps: false,
-    // freezeTableName: true
+      timestamps: false
   })
   auth_papeis.associate = function(models) {
     // associations can be defined here
   }
   auth_papeis.removeAttribute('id')
-  return auth_papeis;
-};
+  return auth_papeis
+}

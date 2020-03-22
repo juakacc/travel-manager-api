@@ -18,5 +18,5 @@ module.exports = (sequelize, DataTypes) => {
     })
   }
   auth_permissoes.removeAttribute('id')
-  return auth_permissoes;
-};
+  return auth_permissoes
+}
