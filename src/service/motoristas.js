@@ -196,7 +196,7 @@ exports.editar = async (req, res, next) => {
 
     if (!req.userData.roles.includes(constantes.ADMIN) && req.userData.id != id) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
-            mensagem: 'Você não tem autorização para alterar esse motorista'
+            mensagem: 'Você não tem autorização para alterar esse motorista!'
         })
     }
 

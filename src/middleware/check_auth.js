@@ -22,14 +22,14 @@ const check = async (req, res, next, role) => {
             if (permissoes.length == 0) {
                 permissoes.push(constantes.MOTORISTA)
             }
-            console.log('Permissões do usuário:', permissoes)
+            // console.log('Permissões do usuário:', permissoes)
             if (permissoes.includes(role) || permissoes.includes(constantes.ADMIN)) { // ADMIN > MOTORISTA
                 req.userData = decodificado
                 req.userData.roles = permissoes // adicionando roles na requisição
                 next()        
             } else {
                 return res.status(HttpStatus.UNAUTHORIZED).json({
-                    mensagem: 'Você não tem permissão para realizar essa ação!',
+                    mensagem: 'Você não tem permissão para realizar essa ação, contate o administrador!',
                     tokenExpirado : false
                 })
             }
