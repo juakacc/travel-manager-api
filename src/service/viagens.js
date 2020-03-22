@@ -38,7 +38,7 @@ const checkCNH = (motorista, veiculo) => {
         case 'C':
             return ['AC', 'AD', 'AE', 'D', 'E'].includes(motorista)
         case 'D':
-            return ['AD', 'E'].includes(motorista)
+            return ['AD', 'E', 'AE'].includes(motorista)
         case 'E':
             return ['AE'].includes(motorista)
         default:
@@ -254,13 +254,14 @@ exports.iniciar = async (req, res, next) => {
             mensagem: 'CNH incompatível com a requerida pelo veículo'
         })
     }
-
+    
     if (saida) {
         const data = saida.replace("T", " ")
         const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/
+        const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/ // app antigo
         const s = new Date(data)
 
-        if (!padrao.test(data) || isNaN(s.getTime())) {
+        if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime())) {
             return res.status(HttpStatus.BAD_REQUEST).json({
                 mensagem: 'A data não segue o padrão: yyyy-MM-dd HH:mm:ss'
             })
@@ -330,12 +331,13 @@ exports.concluir = async (req, res, next) => {
     }
 
     const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/
-
+    const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/ // app antigo
+    
     if (saida) {
         const aux = saida.replace("T", " ")    
         const s = new Date(aux)
 
-        if (!padrao.test(aux) || isNaN(s.getTime())) {
+        if ((!padrao.test(aux) && !padrao2.test(aux)) || isNaN(s.getTime())) {
             return res.status(HttpStatus.BAD_REQUEST).json({
                 mensagem: 'A data de saída não segue o padrão: yyyy-MM-dd HH:mm:ss'
             })
@@ -373,7 +375,6 @@ exports.concluir = async (req, res, next) => {
         inicialKm = viagem.dataValues.km_inicial
     }
 
-    console.log(`KM FINAL: ${km_final}, KM INICIAL: ${inicialKm}`)
     if (parseFloat(km_final) < parseFloat(inicialKm)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
             mensagem: `KM final (${km_final}KM) não pode ser menor que KM inicial (${inicialKm}KM)`
@@ -384,7 +385,7 @@ exports.concluir = async (req, res, next) => {
         const aux = chegada.replace("T", " ")
         const s = new Date(aux)
 
-        if (!padrao.test(aux) || isNaN(s.getTime())) {
+        if ((!padrao.test(aux) && !padrao2.test(aux)) || isNaN(s.getTime())) {
             return res.status(HttpStatus.BAD_REQUEST).json({
                 mensagem: 'A data de chegada não segue o padrão: yyyy-MM-dd HH:mm:ss'
             })
