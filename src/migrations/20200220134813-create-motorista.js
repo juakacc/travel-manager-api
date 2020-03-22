@@ -38,9 +38,9 @@ module.exports = {
             type: Sequelize.TEXT,
             allowNull: false
         }
-    });
+    })
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('motorista');
+      return queryInterface.dropTable('motorista')
   }
 };
