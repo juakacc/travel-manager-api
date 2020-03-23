@@ -59,7 +59,7 @@ exports.get_by_id = (req, res, next) => {
 
 exports.salvar = async (req, res, next) => {
     const { nome, apelido, cnh, categoria, telefone, senha, permissoes } = req.body
-
+    
     const salvar = {
         nome, apelido, cnh, categoria, telefone, senha, permissoes
     }
