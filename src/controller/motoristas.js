@@ -24,9 +24,9 @@ const router = express.Router();
  * @apiSuccess {String}   motorista.nome       Nome do motorista.
  * @apiSuccess {String}   motorista.apelido    Nome do motorista.
  * @apiSuccess {String}   motorista.cnh        Número da CNH do motorista.
- * @apiSuccess {String{..2}}   motorista.categoria  Categoria da CNH do motorista.
+ * @apiSuccess {String}   motorista.categoria  Categoria da CNH do motorista.
  * @apiSuccess {String}   motorista.telefone   Telefone do motorista.
- * @apiSuccess {Boolean}     motorista.disponivel True caso o motorista esteja disponível, False caso contrário.
+ * @apiSuccess {Boolean}  motorista.disponivel <code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.
  *
  * @apiSuccessExample Success-Response:
  *    HTTP/1.1 200 OK
@@ -67,9 +67,9 @@ router.get(
  * @apiSuccess {String}   nome       Nome do motorista.
  * @apiSuccess {String}   apelido    Nome do motorista.
  * @apiSuccess {String}   cnh        Número da CNH do motorista.
- * @apiSuccess {String{..2}}   categoria  Categoria da CNH do motorista.
+ * @apiSuccess {String}   categoria  Categoria da CNH do motorista.
  * @apiSuccess {String}   telefone   Telefone do motorista.
- * @apiSuccess {Boolean}     disponivel True caso o motorista esteja disponível, False caso contrário.
+ * @apiSuccess {Boolean}  disponivel <code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.
  * @apiSuccess {String[]} permissoes Permissões do motorista.
  *
  * @apiSuccessExample Success-Response:
@@ -109,15 +109,15 @@ router.get(
  *
  * @apiUse Header
  *
- * @apiParam {String}  nome                    Nome do motorista.
- * @apiParam {String}  apelido                 Apelido do motorista.
- * @apiParam {String}  cnh                     Número da CNH do motorista.
- * @apiParam {String{..2}}  categoria               Categoria da CNH do motorista.
- * @apiParam {String}  telefone                Telefone do motorista.
- * @apiParam {String}  senha                   Senha do motorista.
- * @apiParam {Object}  [permissoes="{motorista: true}"]            Permissões do motorista
- * @apiParam {Boolean} [permissoes[motorista]] Permissão de motorista
- * @apiParam {Boolean} [permissoes[admin]]     Permissão de administrador
+ * @apiParam {String}                                         nome                             Nome do motorista.
+ * @apiParam {String}                                         apelido                          Apelido do motorista.
+ * @apiParam {String}                                         cnh                              Número da CNH do motorista.
+ * @apiParam {String="A","B","C","D","E","AB","AC","AD","AE"} categoria                        Categoria da CNH do motorista.
+ * @apiParam {String}                                         telefone                         Telefone do motorista.
+ * @apiParam {String}                                         senha                            Senha do motorista.
+ * @apiParam {Object}                                         [permissoes="{motorista: true}"] Permissões do motorista
+ * @apiParam {Boolean}                                        [permissoes[motorista]]          Permissão de motorista
+ * @apiParam {Boolean}                                        [permissoes[admin]]              Permissão de administrador
  *
  * @apiParamExample {json} Request-Example:
  *     {
@@ -133,13 +133,13 @@ router.get(
  *       }
  *     }
  *
- * @apiSuccess {Number} id ID do motorista.
- * @apiSuccess {String} nome  Nome do motorista.
- * @apiSuccess {String} apelido  Nome do motorista.
- * @apiSuccess {String} cnh  Número da CNH do motorista.
- * @apiSuccess {String{..2}} categoria  Categoria da CNH do motorista.
- * @apiSuccess {String} telefone  Telefone do motorista.
- * @apiSuccess {Boolean} disponivel  True caso o motorista esteja disponível, False caso contrário.
+ * @apiSuccess {Number}  id         ID do motorista.
+ * @apiSuccess {String}  nome       Nome do motorista.
+ * @apiSuccess {String}  apelido    Nome do motorista.
+ * @apiSuccess {String}  cnh        Número da CNH do motorista.
+ * @apiSuccess {String}  categoria  Categoria da CNH do motorista.
+ * @apiSuccess {String}  telefone   Telefone do motorista.
+ * @apiSuccess {Boolean} disponivel <code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.
  *
  * @apiSuccessExample {json} Success-Response:
  *    HTTP/1.1 201 Created
@@ -166,7 +166,7 @@ router.post(
 );
 
 /**
- * @api {put} /motoristas/:motoristaId Atualiza um Motorista.
+ * @api {put} /motoristas/:motoristaId Atualiza um Motorista
  * @apiName updateMotorista
  * @apiGroup Motoristas
  *
@@ -174,11 +174,11 @@ router.post(
  *
  * @apiParam  {Number} motoristaId Id do motorista
  *
- * @apiParam {String}  [nome]                    Nome do motorista.
- * @apiParam {String}  [apelido]                 Apelido do motorista.
- * @apiParam {String}  [cnh]                     Número da CNH do motorista.
- * @apiParam {String{..2}}  [categoria]               Categoria da CNH do motorista.
- * @apiParam {String}  [telefone]                Telefone do motorista.
+ * @apiParam {String}                                         [nome]      Nome do motorista.
+ * @apiParam {String}                                         [apelido]   Apelido do motorista.
+ * @apiParam {String}                                         [cnh]       Número da CNH do motorista.
+ * @apiParam {String="A","B","C","D","E","AB","AC","AD","AE"} [categoria] Categoria da CNH do motorista.
+ * @apiParam {String}                                         [telefone]  Telefone do motorista.
  *
  * @apiParamExample {json} Request-Example:
  *     {
@@ -189,13 +189,13 @@ router.post(
  *       "telefone": "999999999"
  *     }
  *
- * @apiSuccess {Number} id ID do motorista.
- * @apiSuccess {String} nome  Nome do motorista.
- * @apiSuccess {String} apelido  Nome do motorista.
- * @apiSuccess {String} cnh  Número da CNH do motorista.
- * @apiSuccess {String{..2}} categoria  Categoria da CNH do motorista.
- * @apiSuccess {String} telefone  Telefone do motorista.
- * @apiSuccess {Boolean} disponivel  True caso o motorista esteja disponível, False caso contrário.
+ * @apiSuccess {Number}  id         ID do motorista.
+ * @apiSuccess {String}  nome       Nome do motorista.
+ * @apiSuccess {String}  apelido    Nome do motorista.
+ * @apiSuccess {String}  cnh        Número da CNH do motorista.
+ * @apiSuccess {String}  categoria  Categoria da CNH do motorista.
+ * @apiSuccess {String}  telefone   Telefone do motorista.
+ * @apiSuccess {Boolean} disponivel <code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.
  *
  * @apiSuccessExample {json} Success-Response:
  *    HTTP/1.1 200 OK
@@ -228,11 +228,11 @@ router.put(
 );
 
 /**
- * @api {delete} /motoristas/:motoristaId Deleta um Motorista.
+ * @api {delete} /motoristas/:motoristaId Deleta um Motorista
  * @apiName deleteMotorista
  * @apiGroup Motoristas
  *
- * @apiParam  {Number} motoristaId Id do motorista
+ * @apiParam {Number} motoristaId Id do motorista
  *
  * @apiUse Header
  *
