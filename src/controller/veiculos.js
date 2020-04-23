@@ -149,6 +149,7 @@ router.get(
  * @api {post} /veiculos Cadastra um novo Veículo
  * @apiName saveVeiculo
  * @apiGroup Veiculos
+ * @apiPermission admin
  *
  * @apiUse Header
  *
@@ -210,6 +211,7 @@ router.post(
  * @api {put} /veiculos/:veiculoId Atualiza um Veículo
  * @apiName updateVeiculo
  * @apiGroup Veiculos
+ * @apiPermission admin
  *
  * @apiUse Header
  *
@@ -278,6 +280,7 @@ router.put(
  * @api {delete} /veiculos/:veiculoId Deleta um Veículo
  * @apiName deleteVeiculo
  * @apiGroup Veiculos
+ * @apiPermission admin
  *
  * @apiParam {Number} veiculoId ID do veículo
  *

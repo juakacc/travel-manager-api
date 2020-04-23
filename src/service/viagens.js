@@ -315,7 +315,7 @@ exports.iniciar = async (req, res, next) => {
         include: [Veiculo, Motorista],
       })
         .then(viagem => {
-          res.status(HttpStatus.OK).json(convertViagem(viagem));
+          res.status(HttpStatus.CREATED).json(convertViagem(viagem));
         })
         .catch(err => {
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

@@ -83,6 +83,11 @@ define({ "api": [
     "title": "Deleta um Motorista",
     "name": "deleteMotorista",
     "group": "Motoristas",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -332,6 +337,11 @@ define({ "api": [
     "title": "Cadastra um Motorista",
     "name": "saveMotorista",
     "group": "Motoristas",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -671,6 +681,11 @@ define({ "api": [
     "title": "Deleta um Veículo",
     "name": "deleteVeiculo",
     "group": "Veiculos",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1043,6 +1058,11 @@ define({ "api": [
     "title": "Cadastra um novo Veículo",
     "name": "saveVeiculo",
     "group": "Veiculos",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1221,6 +1241,11 @@ define({ "api": [
     "title": "Atualiza um Veículo",
     "name": "updateVeiculo",
     "group": "Veiculos",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
     "parameter": {
       "fields": {
         "Parameter": [
@@ -1380,6 +1405,1320 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "controller/veiculos.js",
     "groupTitle": "Veiculos",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n  \"Authorization\": \"Bearer TOKEN\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "delete",
+    "url": "/viagens/:viagemId",
+    "title": "Deleta uma Viagem",
+    "name": "deleteViagem",
+    "group": "Viagens",
+    "permission": [
+      {
+        "name": "admin"
+      }
+    ],
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "viagemId",
+            "description": "<p>Id da viagem.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 204 No Content",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "controller/viagens.js",
+    "groupTitle": "Viagens",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n  \"Authorization\": \"Bearer TOKEN\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/viagens/:viagemId",
+    "title": "Recupera uma viagem específica",
+    "name": "getViagem",
+    "group": "Viagens",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "viagemId",
+            "description": "<p>Id da viagem a ser buscado</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "saida",
+            "description": "<p>Momento do início da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km_inicial",
+            "description": "<p>Quilometragem inicial do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "chegada",
+            "description": "<p>Momento da chegada da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": true,
+            "field": "km_final",
+            "description": "<p>Quilometragem final do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "descricao",
+            "description": "<p>Descrição sobre a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "veiculo",
+            "description": "<p>Veículo que realizou a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.id",
+            "description": "<p>Id do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.nome",
+            "description": "<p>Nome do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.placa",
+            "description": "<p>Placa do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.renavam",
+            "description": "<p>Renavam do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.marca",
+            "description": "<p>Marca do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.modelo",
+            "description": "<p>Modelo do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.quilometragem",
+            "description": "<p>Quilometragem atual do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "veiculo.disponivel",
+            "description": "<p><code>True</code> caso o veiculo esteja disponível, <code>False</code> caso contrário.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.cnh_requerida",
+            "description": "<p>CNH requerida para conduzir o veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "mostorista",
+            "description": "<p>Motorista que realizou a viagem.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "motorista.id",
+            "description": "<p>ID do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.nome",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.apelido",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.cnh",
+            "description": "<p>Número da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.categoria",
+            "description": "<p>Categoria da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.telefone",
+            "description": "<p>Telefone do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "motorista.disponivel",
+            "description": "<p><code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n  \"id\": 1,\n  \"saida\": \"2020-03-22 11:19:00\",\n  \"km_inicial\": 20000,\n  \"chegada\": \"2020-03-22 13:22:00\",\n  \"km_final\": 20300,\n  \"descricao\": null,\n  \"veiculo\": {\n    \"id\": 1,\n    \"nome\": \"GOL-02\",\n    \"placa\": \"QFI-1929\",\n    \"renavam\": \"0982374987\",\n    \"marca\": \"Volks\",\n    \"modelo\": \"Gol\",\n    \"quilometragem\": \"20300\",\n    \"disponivel\": true,\n    \"cnh_requerida\": \"B\"\n  },\n  \"motorista\": {\n    \"id\": 1,\n    \"nome\": \"João Souza\",\n    \"apelido\": \"joao\",\n    \"cnh\": \"1234234\",\n    \"categoria\": \"AB\",\n    \"telefone\": \"999229933\",\n    \"disponivel\": true\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ViagemNotFound",
+            "description": "<p>O <code>id</code> da viagem não foi encontrado.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"mensagem\": \"Viagem não encontrada\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "controller/viagens.js",
+    "groupTitle": "Viagens",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n  \"Authorization\": \"Bearer TOKEN\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/viagens/atual/:motoristaId",
+    "title": "Recupera a viagem atual de um motorista, caso exista",
+    "name": "getViagemMotorista",
+    "group": "Viagens",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "motoristaId",
+            "description": "<p>Id do motorista</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "saida",
+            "description": "<p>Momento do início da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km_inicial",
+            "description": "<p>Quilometragem inicial do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "descricao",
+            "description": "<p>Descrição sobre a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "veiculo",
+            "description": "<p>Veículo que realizou a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.id",
+            "description": "<p>Id do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.nome",
+            "description": "<p>Nome do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.placa",
+            "description": "<p>Placa do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.renavam",
+            "description": "<p>Renavam do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.marca",
+            "description": "<p>Marca do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.modelo",
+            "description": "<p>Modelo do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.quilometragem",
+            "description": "<p>Quilometragem atual do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "veiculo.disponivel",
+            "description": "<p><code>True</code> caso o veiculo esteja disponível, <code>False</code> caso contrário.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.cnh_requerida",
+            "description": "<p>CNH requerida para conduzir o veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "mostorista",
+            "description": "<p>Motorista que realizou a viagem.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "motorista.id",
+            "description": "<p>ID do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.nome",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.apelido",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.cnh",
+            "description": "<p>Número da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.categoria",
+            "description": "<p>Categoria da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.telefone",
+            "description": "<p>Telefone do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "motorista.disponivel",
+            "description": "<p><code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n  \"id\": 1,\n  \"saida\": \"2020-03-22 11:19:00\",\n  \"km_inicial\": 20000,\n  \"descricao\": null,\n  \"veiculo\": {\n    \"id\": 1,\n    \"nome\": \"GOL-02\",\n    \"placa\": \"QFI-1929\",\n    \"renavam\": \"0982374987\",\n    \"marca\": \"Volks\",\n    \"modelo\": \"Gol\",\n    \"quilometragem\": \"20300\",\n    \"disponivel\": false,\n    \"cnh_requerida\": \"B\"\n  },\n  \"motorista\": {\n    \"id\": 1,\n    \"nome\": \"João Souza\",\n    \"apelido\": \"joao\",\n    \"cnh\": \"1234234\",\n    \"categoria\": \"AB\",\n    \"telefone\": \"999229933\",\n    \"disponivel\": false\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "ViagemNotFound",
+            "description": "<p>O motorista não tem nenhuma viagem em andamento.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"mensagem\": \"Viagem não encontrada\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "controller/viagens.js",
+    "groupTitle": "Viagens",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n  \"Authorization\": \"Bearer TOKEN\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/viagens/?date=_&status=_",
+    "title": "Recupera as Viagens",
+    "name": "getViagens",
+    "group": "Viagens",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"yyyy-MM-dd hh:mm:ss\""
+            ],
+            "optional": true,
+            "field": "date",
+            "description": "<p>Data a ser buscada</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"concluida\"",
+              "\"nao-concluida\""
+            ],
+            "optional": true,
+            "field": "status",
+            "description": "<p>Status da viagem</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "saida",
+            "description": "<p>Momento do início da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km_inicial",
+            "description": "<p>Quilometragem inicial do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "chegada",
+            "description": "<p>Momento da chegada da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": true,
+            "field": "km_final",
+            "description": "<p>Quilometragem final do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "descricao",
+            "description": "<p>Descrição sobre a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "veiculo",
+            "description": "<p>Veículo que realizou a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.id",
+            "description": "<p>Id do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.nome",
+            "description": "<p>Nome do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.placa",
+            "description": "<p>Placa do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.renavam",
+            "description": "<p>Renavam do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.marca",
+            "description": "<p>Marca do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.modelo",
+            "description": "<p>Modelo do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.quilometragem",
+            "description": "<p>Quilometragem atual do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "veiculo.disponivel",
+            "description": "<p><code>True</code> caso o veiculo esteja disponível, <code>False</code> caso contrário.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.cnh_requerida",
+            "description": "<p>CNH requerida para conduzir o veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "mostorista",
+            "description": "<p>Motorista que realizou a viagem.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "motorista.id",
+            "description": "<p>ID do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.nome",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.apelido",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.cnh",
+            "description": "<p>Número da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.categoria",
+            "description": "<p>Categoria da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.telefone",
+            "description": "<p>Telefone do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "motorista.disponivel",
+            "description": "<p><code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n[{\n  \"id\": 1,\n  \"saida\": \"2020-03-22 11:19:00\",\n  \"km_inicial\": 20000,\n  \"chegada\": \"2020-03-22 13:22:00\",\n  \"km_final\": 20300,\n  \"descricao\": null,\n  \"veiculo\": {\n    \"id\": 1,\n    \"nome\": \"GOL-02\",\n    \"placa\": \"QFI-1929\",\n    \"renavam\": \"0982374987\",\n    \"marca\": \"Volks\",\n    \"modelo\": \"Gol\",\n    \"quilometragem\": \"20300\",\n    \"disponivel\": true,\n    \"cnh_requerida\": \"B\"\n  },\n  \"motorista\": {\n    \"id\": 1,\n    \"nome\": \"João Souza\",\n    \"apelido\": \"joao\",\n    \"cnh\": \"1234234\",\n    \"categoria\": \"AB\",\n    \"telefone\": \"999229933\",\n    \"disponivel\": true\n  }\n}]",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Status inválido\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Data inválida\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "controller/viagens.js",
+    "groupTitle": "Viagens",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n  \"Authorization\": \"Bearer TOKEN\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/viagens",
+    "title": "Inicia uma viagem",
+    "name": "saveViagem",
+    "group": "Viagens",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"yyyy-MM-dd hh:mm:ss\""
+            ],
+            "optional": false,
+            "field": "saida",
+            "description": "<p>Momento do início da viagem</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "km_inicial",
+            "description": "<p>Quilometragem inicial da viagem</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "descricao",
+            "description": "<p>Descrição sobre a viagem</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo",
+            "description": "<p><code>Id</code> do veículo</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "motorista",
+            "description": "<p><code>Id</code> do motorista</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    \"saida\": \"2020-01-20 20:52:32\",\n    \"km_inicial\": 200,\n    \"veiculo\": 1,\n    \"motorista\": 1\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "saida",
+            "description": "<p>Momento do início da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km_inicial",
+            "description": "<p>Quilometragem inicial do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "descricao",
+            "description": "<p>Descrição sobre a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "veiculo",
+            "description": "<p>Veículo que realizou a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.id",
+            "description": "<p>Id do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.nome",
+            "description": "<p>Nome do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.placa",
+            "description": "<p>Placa do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.renavam",
+            "description": "<p>Renavam do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.marca",
+            "description": "<p>Marca do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.modelo",
+            "description": "<p>Modelo do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.quilometragem",
+            "description": "<p>Quilometragem atual do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "veiculo.disponivel",
+            "description": "<p><code>True</code> caso o veiculo esteja disponível, <code>False</code> caso contrário.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.cnh_requerida",
+            "description": "<p>CNH requerida para conduzir o veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "mostorista",
+            "description": "<p>Motorista que realizou a viagem.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "motorista.id",
+            "description": "<p>ID do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.nome",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.apelido",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.cnh",
+            "description": "<p>Número da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.categoria",
+            "description": "<p>Categoria da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.telefone",
+            "description": "<p>Telefone do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "motorista.disponivel",
+            "description": "<p><code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 201 Created\n{\n  \"id\": 1,\n  \"saida\": \"2020-01-20 20:52:32\",\n  \"km_inicial\": 200,\n  \"descricao\": null,\n  \"veiculo\": {\n    \"id\": 1,\n    \"nome\": \"GOL-02\",\n    \"placa\": \"QFI-1929\",\n    \"renavam\": \"0982374987\",\n    \"marca\": \"Volks\",\n    \"modelo\": \"Gol\",\n    \"quilometragem\": \"200\",\n    \"disponivel\": false,\n    \"cnh_requerida\": \"B\"\n  },\n  \"motorista\": {\n    \"id\": 1,\n    \"nome\": \"João Souza\",\n    \"apelido\": \"joao\",\n    \"cnh\": \"1234234\",\n    \"categoria\": \"AB\",\n    \"telefone\": \"999229933\",\n    \"disponivel\": false\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "VeiculoNotFound",
+            "description": "<p>O <code>id</code> do veículo não foi encontrado.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "MotoristaNotFound",
+            "description": "<p>O <code>id</code> do motorista não foi encontrado.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Veículo inexistente\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Motorista inexistente\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Veículo indisponível\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Motorista indisponível\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"CNH incompatível com a requerida pelo veículo\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Parâmetro inválido\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "controller/viagens.js",
+    "groupTitle": "Viagens",
+    "header": {
+      "examples": [
+        {
+          "title": "Header-Example:",
+          "content": "{\n  \"Authorization\": \"Bearer TOKEN\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "put",
+    "url": "/viagens/:viagemId",
+    "title": "Conclui uma viagem",
+    "name": "updateViagem",
+    "group": "Viagens",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "viagemId",
+            "description": "<p>Id da viagem</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"yyyy-MM-dd hh:mm:ss\""
+            ],
+            "optional": false,
+            "field": "chegada",
+            "description": "<p>Momento do fim da viagem</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": false,
+            "field": "km_final",
+            "description": "<p>Quilometragem final da viagem</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"yyyy-MM-dd hh:mm:ss\""
+            ],
+            "optional": true,
+            "field": "saida",
+            "description": "<p>Momento do início da viagem</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "km_inicial",
+            "description": "<p>Quilometragem inicial da viagem</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "descricao",
+            "description": "<p>Descrição sobre a viagem</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n    \"saida\": \"2020-01-20 20:52:32\",\n    \"km_inicial\": 200,\n    \"chegada\": \"2020-01-20 22:52:32\",\n    \"km_final\": 400,\n    \"descricao\": \"São José da Lagoa Tapada\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "saida",
+            "description": "<p>Momento do início da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km_inicial",
+            "description": "<p>Quilometragem inicial do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "chegada",
+            "description": "<p>Momento da chegada da viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km_final",
+            "description": "<p>Quilometragem final do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "descricao",
+            "description": "<p>Descrição sobre a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "veiculo",
+            "description": "<p>Veículo que realizou a viagem</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.id",
+            "description": "<p>Id do veículo</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.nome",
+            "description": "<p>Nome do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.placa",
+            "description": "<p>Placa do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.renavam",
+            "description": "<p>Renavam do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.marca",
+            "description": "<p>Marca do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.modelo",
+            "description": "<p>Modelo do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "veiculo.quilometragem",
+            "description": "<p>Quilometragem atual do veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "veiculo.disponivel",
+            "description": "<p><code>True</code> caso o veiculo esteja disponível, <code>False</code> caso contrário.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "veiculo.cnh_requerida",
+            "description": "<p>CNH requerida para conduzir o veiculo.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "mostorista",
+            "description": "<p>Motorista que realizou a viagem.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "motorista.id",
+            "description": "<p>ID do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.nome",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.apelido",
+            "description": "<p>Nome do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.cnh",
+            "description": "<p>Número da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.categoria",
+            "description": "<p>Categoria da CNH do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "motorista.telefone",
+            "description": "<p>Telefone do motorista.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "motorista.disponivel",
+            "description": "<p><code>True</code> caso o motorista esteja disponível, <code>False</code> caso contrário.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n  \"id\": 1,\n  \"saida\": \"2020-01-20 20:52:32\",\n  \"km_inicial\": 200,\n  \"chegada\": \"2020-01-20 22:52:32\",\n  \"km_final\": 400,\n  \"descricao\": \"São José da Lagoa Tapada\",\n  \"veiculo\": {\n    \"id\": 1,\n    \"nome\": \"GOL-02\",\n    \"placa\": \"QFI-1929\",\n    \"renavam\": \"0982374987\",\n    \"marca\": \"Volks\",\n    \"modelo\": \"Gol\",\n    \"quilometragem\": \"20300\",\n    \"disponivel\": true,\n    \"cnh_requerida\": \"B\"\n  },\n  \"motorista\": {\n    \"id\": 1,\n    \"nome\": \"João Souza\",\n    \"apelido\": \"joao\",\n    \"cnh\": \"1234234\",\n    \"categoria\": \"AB\",\n    \"telefone\": \"999229933\",\n    \"disponivel\": true\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Viagem não encontrada\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Data de chegada anterior a data de saída\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"KM final menor que a KM inicial\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Parâmetro inválido\",\n}",
+          "type": "json"
+        },
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n  \"mensagem\": \"Viagem não encontrada\",\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "controller/viagens.js",
+    "groupTitle": "Viagens",
     "header": {
       "examples": [
         {

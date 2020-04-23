@@ -106,6 +106,7 @@ router.get(
  * @api {post} /motoristas Cadastra um Motorista
  * @apiName saveMotorista
  * @apiGroup Motoristas
+ * @apiPermission admin
  *
  * @apiUse Header
  *
@@ -231,6 +232,7 @@ router.put(
  * @api {delete} /motoristas/:motoristaId Deleta um Motorista
  * @apiName deleteMotorista
  * @apiGroup Motoristas
+ * @apiPermission admin
  *
  * @apiParam {Number} motoristaId Id do motorista
  *
