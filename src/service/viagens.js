@@ -5,6 +5,9 @@ const Veiculo = require("../models").veiculo;
 const Motorista = require("../models").motorista;
 const Viagem = require("../models").viagem;
 
+const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/;
+const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo
+
 const convertViagem = viagem => {
   const vi = {
     id: viagem.dataValues.id,
@@ -103,12 +106,21 @@ exports.get = (req, res, next) => {
         });
     }
   } else if (date) {
+    const data = date.replace("T", " ");
+    const s = new Date(data);
+
+    if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime())) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        mensagem: "A data não segue o padrão: yyyy-MM-dd HH:mm:ss",
+      });
+    }
+    console.log("Data", data);
     Viagem.findAll({
       where: {
         [Op.and]: [
           {
             saida: {
-              [Op.lte]: date,
+              [Op.lte]: data,
             },
           },
           {
@@ -120,7 +132,7 @@ exports.get = (req, res, next) => {
               },
               {
                 chegada: {
-                  [Op.gte]: date,
+                  [Op.gte]: data,
                 },
               },
             ],
@@ -266,8 +278,8 @@ exports.iniciar = async (req, res, next) => {
 
   if (saida) {
     const data = saida.replace("T", " ");
-    const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/;
-    const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo
+    // const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/;
+    // const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo
     const s = new Date(data);
 
     if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime())) {
@@ -341,6 +353,7 @@ exports.concluir = async (req, res, next) => {
   }
 
   const {saida, chegada, km_inicial, km_final, descricao} = req.body;
+
   const salvar = {
     saida,
     chegada,
@@ -349,11 +362,8 @@ exports.concluir = async (req, res, next) => {
     descricao,
   };
 
-  const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/;
-  const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo
-
-  if (saida) {
-    const aux = saida.replace("T", " ");
+  if (salvar.saida) {
+    const aux = salvar.saida.replace("T", " ");
     const s = new Date(aux);
 
     if ((!padrao.test(aux) && !padrao2.test(aux)) || isNaN(s.getTime())) {
@@ -361,47 +371,43 @@ exports.concluir = async (req, res, next) => {
         mensagem: "A data de saída não segue o padrão: yyyy-MM-dd HH:mm:ss",
       });
     }
+    salvar.saida = s; // Date
   } else {
-    delete salvar.saida;
+    salvar.saida = new Date(viagem.dataValues.saida);
   }
 
-  if (km_inicial) {
-    if (isNaN(km_inicial)) {
+  if (salvar.km_inicial) {
+    if (isNaN(salvar.km_inicial)) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         mensagem: "O valor da quilometragem inicial é inválido",
       });
     }
-    salvar.km_inicial = parseFloat(km_inicial);
+    salvar.km_inicial = parseFloat(salvar.km_inicial);
   } else {
-    delete salvar.km_inicial;
+    salvar.km_inicial = parseFloat(viagem.dataValues.km_inicial);
   }
 
-  if (km_final) {
-    if (isNaN(km_final)) {
+  if (salvar.km_final) {
+    if (isNaN(salvar.km_final)) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         mensagem: "O valor da quilometragem final é inválido",
       });
     }
-    salvar.km_final = parseFloat(km_final);
+    salvar.km_final = parseFloat(salvar.km_final);
   } else {
     return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: "A quilometragem final é obrigatória",
     });
   }
 
-  var inicialKm = km_inicial;
-  if (!inicialKm) {
-    inicialKm = viagem.dataValues.km_inicial;
-  }
-
-  if (parseFloat(km_final) < parseFloat(inicialKm)) {
+  if (salvar.km_final < salvar.km_inicial) {
     return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: `KM final (${km_final}KM) não pode ser menor que KM inicial (${inicialKm}KM)`,
+      mensagem: `KM final (${salvar.km_final}KM) não pode ser menor que KM inicial (${salvar.km_inicial}KM)`,
     });
   }
 
-  if (chegada) {
-    const aux = chegada.replace("T", " ");
+  if (salvar.chegada) {
+    const aux = salvar.chegada.replace("T", " ");
     const s = new Date(aux);
 
     if ((!padrao.test(aux) && !padrao2.test(aux)) || isNaN(s.getTime())) {
@@ -409,23 +415,15 @@ exports.concluir = async (req, res, next) => {
         mensagem: "A data de chegada não segue o padrão: yyyy-MM-dd HH:mm:ss",
       });
     }
+    salvar.chegada = s; // Date
   } else {
     return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: "A momento de chegada é obrigatória",
     });
   }
 
-  var saidaAux = saida;
-
-  if (!saidaAux) {
-    saidaAux = viagem.dataValues.saida; // Se ele não enviou agora eu pego a data salva em banco
-  }
-
-  const dataSaida = new Date(saidaAux);
-  const dataChegada = new Date(chegada);
-
-  if (dataChegada < dataSaida) {
-    res.status(HttpStatus.BAD_REQUEST).json({
+  if (salvar.chegada < salvar.saida) {
+    return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: "Data de chegada anterior a data de saída",
     });
   }
