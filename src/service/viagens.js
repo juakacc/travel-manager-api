@@ -114,7 +114,6 @@ exports.get = (req, res, next) => {
         mensagem: "A data não segue o padrão: yyyy-MM-dd HH:mm:ss",
       });
     }
-    console.log("Data", data);
     Viagem.findAll({
       where: {
         [Op.and]: [
@@ -272,14 +271,12 @@ exports.iniciar = async (req, res, next) => {
     )
   ) {
     return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "CNH incompatível com a requerida pelo veículo",
+      mensagem: `Habilitação necessária: ${veiculoBD.dataValues.cnh_requerida}`,
     });
   }
 
   if (saida) {
     const data = saida.replace("T", " ");
-    // const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/;
-    // const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo
     const s = new Date(data);
 
     if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime())) {
@@ -287,7 +284,7 @@ exports.iniciar = async (req, res, next) => {
         mensagem: "A data não segue o padrão: yyyy-MM-dd HH:mm:ss",
       });
     }
-    salvar.saida = data;
+    salvar.saida = s;
   } else {
     return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: "O momento da saída é obrigatório",
