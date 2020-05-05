@@ -1,7 +1,9 @@
-const http = require('http')
-const app = require('./src/app')
+const http = require("http");
+const app = require("./src/app");
 
-const porta = process.env.PORT || 8888
-const server = http.createServer(app)
+const porta = process.env.PORT || 8888;
+const server = http.createServer(app);
 
-server.listen(porta)
+server.listen(porta);
+
+module.exports = app;
