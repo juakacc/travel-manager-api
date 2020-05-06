@@ -4,8 +4,9 @@
   "description": "API para gerenciamento de viagens PMO",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha test --exit",
-    "start": "nodemon"
+    "coverage": "nyc npm run test",
+    "start": "nodemon",
+    "test": "NODE_ENV=test mocha test --exit"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "chai-http": "^4.3.0",
     "mocha": "^7.1.2",
     "nodemon": "^2.0.2",
+    "nyc": "^15.0.1",
     "supertest": "^4.0.2"
   }
 }
