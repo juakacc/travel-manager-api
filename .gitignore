@@ -1,3 +1,4 @@
 node_modules
 .env
-.consertar*
+.env.testing
+.nyc_output
