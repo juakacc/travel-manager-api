@@ -2,7 +2,6 @@ const express = require("express");
 const HttpStatus = require("http-status-codes");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
 
 const Motorista = require("../models").motorista;
 
@@ -45,7 +44,7 @@ const router = express.Router();
  *    }
  */
 router.post("/", (req, res, next) => {
-  const {apelido, senha} = req.body;
+  const { apelido, senha } = req.body;
 
   if (!apelido) {
     return res.status(HttpStatus.BAD_REQUEST).json({
@@ -60,9 +59,9 @@ router.post("/", (req, res, next) => {
   }
 
   Motorista.findAll({
-    where: {apelido},
+    where: { apelido },
   })
-    .then(motoristas => {
+    .then((motoristas) => {
       if (motoristas.length < 1) {
         return res.status(HttpStatus.BAD_REQUEST).json({
           mensagem: "Apelido inválido",
@@ -93,7 +92,7 @@ router.post("/", (req, res, next) => {
         token,
       });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: err,

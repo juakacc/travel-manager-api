@@ -9,7 +9,8 @@ const motoristaRotas = require("./controller/motoristas");
 const viagensRotas = require("./controller/viagens");
 const loginRotas = require("./controller/login");
 
-app.use(morgan("dev"));
+if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
+
 app.use(
   bodyparse.urlencoded({
     extended: false,
