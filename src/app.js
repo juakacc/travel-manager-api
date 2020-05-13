@@ -7,6 +7,7 @@ const app = express();
 const veiculoRotas = require("./controller/veiculos");
 const motoristaRotas = require("./controller/motoristas");
 const viagensRotas = require("./controller/viagens");
+const abastecimentosRotas = require("./controller/abastecimentos");
 const loginRotas = require("./controller/login");
 
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
@@ -35,6 +36,7 @@ app.use("/veiculos", veiculoRotas);
 app.use("/motoristas", motoristaRotas);
 app.use("/viagens", viagensRotas);
 app.use("/login", loginRotas);
+app.use("/abastecimentos", abastecimentosRotas);
 
 app.use(express.static(__dirname + "/doc"));
 // app.get("/doc", (req, res) => {
