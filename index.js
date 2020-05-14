@@ -10,4 +10,4 @@ const server = http.createServer(app);
 
 server.listen(porta);
 
-module.exports = app;
+// module.exports = app;
