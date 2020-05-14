@@ -23,13 +23,37 @@ exports.get_by_id = (req, res) => {
   const id = req.params.servicoId;
 
   Servico.findByPk(id)
-    .then((servico) => {
-      if (!servico) {
+    .then((response) => {
+      if (!response) {
         return res.status(HttpStatus.NOT_FOUND).json({
           mensagem: "Serviço não encontrado",
         });
       } else {
-        return res.status(HttpStatus.OK).json(servico.dataValues);
+        const servico = response.dataValues;
+
+        Revisao.findAll({
+          where: {
+            id_servico: servico.id,
+          },
+        })
+          .then((revisoes) => {
+            if (revisoes.length !== 0) {
+              const revisao = revisoes[0].dataValues;
+              delete revisao.id_servico;
+
+              const newService = Object.assign({}, servico, {
+                revisao,
+              });
+              return res.status(HttpStatus.OK).json(newService);
+            } else {
+              // Sem revisões
+              return res.status(HttpStatus.OK).json(servico);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            return res.status(HttpStatus.OK).json(servico);
+          });
       }
     })
     .catch((err) => {
