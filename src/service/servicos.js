@@ -1,12 +1,15 @@
 const HttpStatus = require("http-status-codes");
 const Veiculo = require("../models").veiculo;
-const Abastecimento = require("../models").abastecimento;
+const Servico = require("../models").servico;
+const Revisao = require("../models").servico_revisao;
 const ADMIN = require("../constantes").ADMIN;
 
+const validar_data = require("../utils");
+
 exports.get = (req, res) => {
-  Abastecimento.findAll()
-    .then((abastecimentos) => {
-      return res.status(HttpStatus.OK).json(abastecimentos);
+  Servico.findAll()
+    .then((servicos) => {
+      return res.status(HttpStatus.OK).json(servicos);
     })
     .catch((err) => {
       console.log(err);
@@ -17,16 +20,16 @@ exports.get = (req, res) => {
 };
 
 exports.get_by_id = (req, res) => {
-  const id = req.params.abastecimentoId;
+  const id = req.params.servicoId;
 
-  Abastecimento.findByPk(id)
-    .then((abastecimento) => {
-      if (!abastecimento) {
+  Servico.findByPk(id)
+    .then((servico) => {
+      if (!servico) {
         return res.status(HttpStatus.NOT_FOUND).json({
-          mensagem: "Abastecimento não encontrado",
+          mensagem: "Serviço não encontrado",
         });
       } else {
-        return res.status(HttpStatus.OK).json(abastecimento.dataValues);
+        return res.status(HttpStatus.OK).json(servico.dataValues);
       }
     })
     .catch((err) => {
@@ -38,7 +41,7 @@ exports.get_by_id = (req, res) => {
 };
 
 exports.save = async (req, res) => {
-  const { quilometragem, quantidade, tipo, veiculo } = req.body;
+  const { quilometragem, descricao, veiculo, revisao } = req.body;
 
   if (veiculo) {
     const veiculoBD = await Veiculo.findByPk(veiculo);
@@ -65,43 +68,33 @@ exports.save = async (req, res) => {
     });
   }
 
-  if (quantidade) {
-    if (isNaN(quantidade)) {
+  if (descricao) {
+    if (descricao.toString().trim().length === 0) {
       return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "O valor da quantidade é inválido",
+        mensagem: "A descrição é obrigatória",
       });
     }
   } else {
     return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "A quantidade é obrigatória",
-    });
-  }
-
-  // Validar tipos [gasolina, diesel...]
-  if (tipo) {
-    if (tipo.trim().length === 0) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Tipo de combustível inválido",
-      });
-    }
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "Tipo de combustível é obrigatório",
+      mensagem: "A descrição é obrigatória",
     });
   }
 
   const salvar = {
     quilometragem,
-    quantidade,
-    tipo,
+    descricao,
     momento: new Date(),
     id_veiculo: veiculo,
     id_responsavel: req.userData.id,
   };
 
-  Abastecimento.create(salvar)
-    .then((abastecimento) => {
-      return res.status(HttpStatus.CREATED).json(abastecimento);
+  Servico.create(salvar)
+    .then((servico) => {
+      if (revisao) {
+        return save_revisao(res, servico, revisao);
+      } else {
+        return res.status(HttpStatus.CREATED).json(servico);
+      }
     })
     .catch((err) => {
       console.log(err);
@@ -111,21 +104,65 @@ exports.save = async (req, res) => {
     });
 };
 
+const save_revisao = (res, servico, revisao) => {
+  const { quilometragem, momento, descricao } = revisao;
+  const id_servico = servico.id;
+
+  if (quilometragem) {
+    if (isNaN(quilometragem)) {
+      return res.status(HttpStatus.CREATED).json(servico);
+    }
+  } else {
+    return res.status(HttpStatus.CREATED).json(servico);
+  }
+
+  if (descricao) {
+    if (descricao.toString().trim().length === 0) {
+      return res.status(HttpStatus.CREATED).json(servico);
+    }
+  } else {
+    return res.status(HttpStatus.CREATED).json(servico);
+  }
+
+  if (!validar_data(momento)) {
+    return res.status(HttpStatus.CREATED).json(servico);
+  }
+
+  const salvar = {
+    quilometragem,
+    momento,
+    descricao,
+    id_servico,
+  };
+
+  Revisao.create(salvar)
+    .then((response) => {
+      delete response.dataValues.id_servico;
+      const servicoRevisao = Object.assign({}, servico.dataValues, {
+        revisao: response.dataValues,
+      });
+      return res.status(HttpStatus.CREATED).json(servicoRevisao);
+    })
+    .catch(() => {
+      return res.status(HttpStatus.CREATED).json(servico);
+    });
+};
+
 exports.delete = async (req, res) => {
-  const id = req.params.abastecimentoId;
+  const id = req.params.servicoId;
 
-  const abastecimentoBD = await Abastecimento.findByPk(id);
+  const servicoBD = await Servico.findByPk(id);
 
-  if (abastecimentoBD) {
+  if (servicoBD) {
     if (
-      abastecimentoBD.dataValues.id_responsavel !== req.userData.id &&
+      servicoBD.dataValues.id_responsavel !== req.userData.id &&
       !req.userData.roles.includes(ADMIN)
     ) {
       return res.status(HttpStatus.UNAUTHORIZED).json({
         mensagem: "Sem permissão para realizar essa ação",
       });
     } else {
-      Abastecimento.destroy({
+      Servico.destroy({
         where: { id },
       })
         .then(() => {
@@ -139,7 +176,7 @@ exports.delete = async (req, res) => {
     }
   } else {
     return res.status(HttpStatus.NOT_FOUND).json({
-      mensagem: "Abastecimento não encontrado",
+      mensagem: "Servico não encontrado",
     });
   }
 };
