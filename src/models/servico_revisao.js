@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       descricao: DataTypes.STRING,
       momento: DataTypes.DATE,
       id_servico: DataTypes.INTEGER,
+      realizada: DataTypes.BOOLEAN,
     },
     {
       timestamps: false,
@@ -15,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   servico_revisao.associate = function (models) {
-    servico_revisao.belongsTo(models.veiculo, {
+    servico_revisao.belongsTo(models.servico, {
       foreignKey: "id_servico",
     });
   };

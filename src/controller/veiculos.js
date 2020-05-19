@@ -145,6 +145,12 @@ router.get(
   veiculos.get_by_id
 );
 
+router.get(
+  "/:veiculoId/revisoes",
+  (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA),
+  veiculos.get_revisoes
+);
+
 /**
  * @api {post} /veiculos Cadastra um novo Veículo
  * @apiName saveVeiculo
