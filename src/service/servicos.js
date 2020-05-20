@@ -7,7 +7,13 @@ const ADMIN = require("../constantes").ADMIN;
 const validar_data = require("../utils");
 
 exports.get = (req, res) => {
-  Servico.findAll()
+  const veiculoId = req.params.veiculoId;
+
+  Servico.findAll({
+    where: {
+      id_veiculo: veiculoId,
+    },
+  })
     .then((servicos) => {
       return res.status(HttpStatus.OK).json(servicos);
     })
@@ -65,7 +71,8 @@ exports.get_by_id = (req, res) => {
 };
 
 exports.save = async (req, res) => {
-  const { quilometragem, descricao, veiculo, revisao } = req.body;
+  const veiculo = req.params.veiculoId;
+  const { quilometragem, descricao, revisao } = req.body;
 
   if (veiculo) {
     const veiculoBD = await Veiculo.findByPk(veiculo);
