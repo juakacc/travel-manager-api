@@ -26,16 +26,17 @@ exports.get = (req, res) => {
 };
 
 exports.get_by_id = (req, res) => {
-  const id = req.params.servicoId;
+  const { veiculoId, servicoId } = req.params;
 
-  Servico.findByPk(id)
+  Servico.findAll({
+    where: {
+      id: servicoId,
+      id_veiculo: veiculoId,
+    },
+  })
     .then((response) => {
-      if (!response) {
-        return res.status(HttpStatus.NOT_FOUND).json({
-          mensagem: "Serviço não encontrado",
-        });
-      } else {
-        const servico = response.dataValues;
+      if (response.length !== 0) {
+        const servico = response[0].dataValues;
 
         Revisao.findAll({
           where: {
@@ -60,6 +61,10 @@ exports.get_by_id = (req, res) => {
             console.log(err);
             return res.status(HttpStatus.OK).json(servico);
           });
+      } else {
+        return res.status(HttpStatus.NOT_FOUND).json({
+          mensagem: "Serviço não encontrado",
+        });
       }
     })
     .catch((err) => {
@@ -180,34 +185,20 @@ const save_revisao = (res, servico, revisao) => {
 };
 
 exports.delete = async (req, res) => {
-  const id = req.params.servicoId;
+  const { veiculoId, servicoId } = req.params;
 
-  const servicoBD = await Servico.findByPk(id);
-
-  if (servicoBD) {
-    if (
-      servicoBD.dataValues.id_responsavel !== req.userData.id &&
-      !req.userData.roles.includes(ADMIN)
-    ) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        mensagem: "Sem permissão para realizar essa ação",
+  Servico.destroy({
+    where: {
+      id: servicoId,
+      id_veiculo: veiculoId,
+    },
+  })
+    .then(() => {
+      res.status(HttpStatus.NO_CONTENT).send();
+    })
+    .catch((err) => {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        mensagem: err,
       });
-    } else {
-      Servico.destroy({
-        where: { id },
-      })
-        .then(() => {
-          res.status(HttpStatus.NO_CONTENT).send();
-        })
-        .catch((err) => {
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            mensagem: err,
-          });
-        });
-    }
-  } else {
-    return res.status(HttpStatus.NOT_FOUND).json({
-      mensagem: "Servico não encontrado",
     });
-  }
 };
