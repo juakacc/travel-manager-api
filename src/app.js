@@ -5,10 +5,10 @@ const HttpStatus = require("http-status-codes");
 const app = express();
 
 const veiculoRotas = require("./controller/veiculos");
-const motoristaRotas = require("./controller/motoristas");
-const viagensRotas = require("./controller/viagens");
 const abastecimentosRotas = require("./controller/abastecimentos");
 const servicosRotas = require("./controller/servicos");
+const motoristaRotas = require("./controller/motoristas");
+const viagensRotas = require("./controller/viagens");
 const loginRotas = require("./controller/login");
 
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
@@ -34,11 +34,12 @@ app.use((req, res, next) => {
 });
 
 app.use("/veiculos", veiculoRotas);
+app.use("/veiculos/:veiculoId/abastecimentos", abastecimentosRotas);
+app.use("/veiculos/:veiculoId/servicos", servicosRotas);
+
 app.use("/motoristas", motoristaRotas);
 app.use("/viagens", viagensRotas);
 app.use("/login", loginRotas);
-app.use("/abastecimentos", abastecimentosRotas);
-app.use("/servicos", servicosRotas);
 
 app.use(express.static(__dirname + "/doc"));
 // app.get("/doc", (req, res) => {

@@ -1,8 +1,9 @@
 const express = require("express");
+const router = express.Router();
+
 const check_auth = require("../middleware/check_auth");
 const veiculos = require("../service/veiculos");
 const constantes = require("../constantes");
-const router = express.Router();
 
 /**
  * @apiDefine Header

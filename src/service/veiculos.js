@@ -89,7 +89,7 @@ exports.get_revisoes = (req, res, next) => {
           where: {
             realizada: false,
             momento: {
-              [Op.lte]: new Date(), // Verificar no fusohorário do server
+              [Op.lte]: new Date(), // ATUAL - Verificar no fusohorário do server
             },
           },
           include: {
@@ -97,9 +97,13 @@ exports.get_revisoes = (req, res, next) => {
             where: {
               id_veiculo: veiculo.id,
             },
+            attributes: ["id"],
           },
+          attributes: ["id", "quilometragem", "descricao", "momento"],
         })
-          .then((revisoes) => res.status(HttpStatus.OK).json(revisoes))
+          .then((revisoes) => {
+            return res.status(HttpStatus.OK).json(revisoes);
+          })
           .catch((err) => {
             console.log(err);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

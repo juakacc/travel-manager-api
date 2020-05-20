@@ -2,7 +2,9 @@ const express = require("express");
 const check_auth = require("../middleware/check_auth");
 const servicos = require("../service/servicos");
 const MOTORISTA = require("../constantes").MOTORISTA;
-const router = express.Router();
+const router = express.Router({
+  mergeParams: true,
+});
 
 router.get(
   "/",

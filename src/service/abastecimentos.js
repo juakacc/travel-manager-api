@@ -1,10 +1,15 @@
 const HttpStatus = require("http-status-codes");
 const Veiculo = require("../models").veiculo;
 const Abastecimento = require("../models").abastecimento;
-const ADMIN = require("../constantes").ADMIN;
 
 exports.get = (req, res) => {
-  Abastecimento.findAll()
+  const { veiculoId } = req.params;
+
+  Abastecimento.findAll({
+    where: {
+      id_veiculo: veiculoId,
+    },
+  })
     .then((abastecimentos) => {
       return res.status(HttpStatus.OK).json(abastecimentos);
     })
@@ -17,16 +22,21 @@ exports.get = (req, res) => {
 };
 
 exports.get_by_id = (req, res) => {
-  const id = req.params.abastecimentoId;
+  const { veiculoId, abastecimentoId } = req.params;
 
-  Abastecimento.findByPk(id)
-    .then((abastecimento) => {
-      if (!abastecimento) {
+  Abastecimento.findAll({
+    where: {
+      id: abastecimentoId,
+      id_veiculo: veiculoId,
+    },
+  })
+    .then((abastecimentos) => {
+      if (abastecimentos.length === 0) {
         return res.status(HttpStatus.NOT_FOUND).json({
           mensagem: "Abastecimento não encontrado",
         });
       } else {
-        return res.status(HttpStatus.OK).json(abastecimento.dataValues);
+        return res.status(HttpStatus.OK).json(abastecimentos[0].dataValues);
       }
     })
     .catch((err) => {
@@ -38,7 +48,8 @@ exports.get_by_id = (req, res) => {
 };
 
 exports.save = async (req, res) => {
-  const { quilometragem, quantidade, tipo, veiculo } = req.body;
+  const veiculo = req.params.veiculoId;
+  const { quilometragem, quantidade, tipo } = req.body;
 
   if (veiculo) {
     const veiculoBD = await Veiculo.findByPk(veiculo);
@@ -112,34 +123,20 @@ exports.save = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-  const id = req.params.abastecimentoId;
+  const { veiculoId, abastecimentoId } = req.params;
 
-  const abastecimentoBD = await Abastecimento.findByPk(id);
-
-  if (abastecimentoBD) {
-    if (
-      abastecimentoBD.dataValues.id_responsavel !== req.userData.id &&
-      !req.userData.roles.includes(ADMIN)
-    ) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        mensagem: "Sem permissão para realizar essa ação",
+  Abastecimento.destroy({
+    where: {
+      id: abastecimentoId,
+      id_veiculo: veiculoId,
+    },
+  })
+    .then(() => {
+      res.status(HttpStatus.NO_CONTENT).send();
+    })
+    .catch((err) => {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        mensagem: err,
       });
-    } else {
-      Abastecimento.destroy({
-        where: { id },
-      })
-        .then(() => {
-          res.status(HttpStatus.NO_CONTENT).send();
-        })
-        .catch((err) => {
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            mensagem: err,
-          });
-        });
-    }
-  } else {
-    return res.status(HttpStatus.NOT_FOUND).json({
-      mensagem: "Abastecimento não encontrado",
     });
-  }
 };

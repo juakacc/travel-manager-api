@@ -2,7 +2,11 @@ const express = require("express");
 const check_auth = require("../middleware/check_auth");
 const abastecimentos = require("../service/abastecimentos");
 const MOTORISTA = require("../constantes").MOTORISTA;
-const router = express.Router();
+const ADMIN = require("../constantes").ADMIN;
+
+const router = express.Router({
+  mergeParams: true,
+});
 
 router.get(
   "/",
@@ -24,7 +28,7 @@ router.post(
 
 router.delete(
   "/:abastecimentoId",
-  (req, res, next) => check_auth(req, res, next, MOTORISTA),
+  (req, res, next) => check_auth(req, res, next, ADMIN),
   abastecimentos.delete
 );
 
