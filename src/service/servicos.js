@@ -116,6 +116,42 @@ exports.save = async (req, res) => {
     });
   }
 
+  if (revisao) {
+    if (revisao.descricao) {
+      if (revisao.descricao.toString().trim().length === 0) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          mensagem: "Informe uma descrição para a revisão",
+        });
+      }
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        mensagem: "A descrição da revisão é obrigatória",
+      });
+    }
+
+    if (!revisao.momento && !revisao.quilometragem) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        mensagem: "A quilometragem ou momento deve ser informado",
+      });
+    }
+
+    if (revisao.quilometragem) {
+      if (isNaN(revisao.quilometragem)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          mensagem: "A quilometragem da revisão é inválida",
+        });
+      }
+    }
+
+    if (revisao.momento) {
+      if (!validar_data(revisao.momento)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          mensagem: "O momento da revisão é inválido",
+        });
+      }
+    }
+  }
+
   const salvar = {
     quilometragem,
     descricao,
@@ -143,26 +179,6 @@ exports.save = async (req, res) => {
 const save_revisao = (res, servico, revisao) => {
   const { quilometragem, momento, descricao } = revisao;
   const id_servico = servico.id;
-
-  if (quilometragem) {
-    if (isNaN(quilometragem)) {
-      return res.status(HttpStatus.CREATED).json(servico);
-    }
-  } else {
-    return res.status(HttpStatus.CREATED).json(servico);
-  }
-
-  if (descricao) {
-    if (descricao.toString().trim().length === 0) {
-      return res.status(HttpStatus.CREATED).json(servico);
-    }
-  } else {
-    return res.status(HttpStatus.CREATED).json(servico);
-  }
-
-  if (!validar_data(momento)) {
-    return res.status(HttpStatus.CREATED).json(servico);
-  }
 
   const salvar = {
     quilometragem,
