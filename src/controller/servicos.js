@@ -24,6 +24,12 @@ router.post(
   servicos.save
 );
 
+router.put(
+  "/:revisaoId",
+  (req, res, next) => check_auth(req, res, next, MOTORISTA),
+  servicos.edit
+);
+
 router.delete(
   "/:servicoId",
   (req, res, next) => check_auth(req, res, next, MOTORISTA),

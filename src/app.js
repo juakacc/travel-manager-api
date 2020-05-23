@@ -37,6 +37,8 @@ app.use("/veiculos", veiculoRotas);
 app.use("/veiculos/:veiculoId/abastecimentos", abastecimentosRotas);
 app.use("/veiculos/:veiculoId/servicos", servicosRotas);
 
+app.use("/servicos/:servicoId/revisoes", servicosRotas);
+
 app.use("/motoristas", motoristaRotas);
 app.use("/viagens", viagensRotas);
 app.use("/login", loginRotas);
