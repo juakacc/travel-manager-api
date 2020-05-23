@@ -87,10 +87,45 @@ exports.get_revisoes = (req, res, next) => {
       if (veiculo) {
         Revisao.findAll({
           where: {
-            realizada: false,
-            momento: {
-              [Op.lte]: new Date(), // ATUAL - Verificar no fusohorário do server
-            },
+            [Op.and]: [
+              {
+                realizada: false,
+              },
+              {
+                [Op.or]: [
+                  {
+                    [Op.and]: [
+                      // IF momento == null => !realizada && revisao.quilometragem <= veiculo.quilometragem
+                      {
+                        momento: {
+                          [Op.is]: null,
+                        },
+                      },
+                      {
+                        quilometragem: {
+                          [Op.lte]: veiculo.quilometragem,
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    [Op.and]: [
+                      // ELSE !realizada && revisao.momento <= data_atual
+                      {
+                        momento: {
+                          [Op.not]: null,
+                        },
+                      },
+                      {
+                        momento: {
+                          [Op.lte]: new Date(), // ATUAL - Verificar no fusohorário do server
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
           include: {
             model: Servico,
