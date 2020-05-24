@@ -44,31 +44,7 @@ exports.get_by_id = (req, res, next) => {
           mensagem: "Veiculo não encontrado",
         });
       } else {
-        // Revisões pendentes
-        //    -
-        Revisao.findAll({
-          where: {
-            realizada: false,
-          },
-          include: {
-            model: Servico,
-            where: {
-              id_veiculo: 1,
-            },
-          },
-        })
-          .then((revisoes) => {
-            const response = Object.assign({}, veiculo.dataValues, {
-              revisao: revisoes,
-            });
-            return res.status(HttpStatus.OK).json(response);
-          })
-          .catch((err) => {
-            console.log(err);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-              mensagem: "Erro interno no servidor",
-            });
-          });
+        return res.status(HttpStatus.OK).json(veiculo.dataValues);
       }
     })
     .catch((err) => {
@@ -159,7 +135,7 @@ exports.get_revisoes = (req, res, next) => {
     });
 };
 
-exports.salvar = async (req, res, next) => {
+exports.salvar = async (req, res) => {
   const {
     nome,
     placa,
@@ -180,96 +156,59 @@ exports.salvar = async (req, res, next) => {
     cnh_requerida,
   };
 
-  if (nome) {
-    if ("" === nome.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Nome inválido",
-      });
-    salvar.nome = nome.toUpperCase();
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "O nome é obrigatório",
-    });
+  const errors = [];
+
+  if (!nome || nome.toString().trim().length === 0) {
+    errors.push("O nome é obrigatório");
   }
 
-  if (placa) {
-    if ("" === placa.trim()) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Placa inválida",
-      });
+  if (!placa || placa.toString().trim().length === 0) {
+    errors.push("A placa é obrigatória");
+  } else {
+    const veiculo = await Veiculo.findAll({
+      where: { placa },
+    });
+    if (veiculo.length > 0) {
+      errors.push("A placa informada já está cadastrada");
     } else {
-      const veiculo = await Veiculo.findAll({
-        where: { placa },
-      });
-      if (veiculo.length > 0) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          mensagem: "A placa informada já está cadastrada",
-        });
-      }
       salvar.placa = placa.toUpperCase();
     }
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "A placa é obrigatória",
-    });
   }
 
-  if (renavam) {
-    if ("" === renavam.trim()) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Renavam inválido",
-      });
-    }
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "O número do renavam é obrigatório",
-    });
+  if (!renavam || renavam.toString().trim().length === 0) {
+    errors.push("O número do renavam é obrigatório");
   }
 
-  if (marca) {
-    if ("" === marca.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Marca inválida",
-      });
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "A marca é obrigatória",
-    });
+  if (!marca || marca.toString().trim().length === 0) {
+    errors.push("A marca é obrigatória");
   }
 
-  if (modelo) {
-    if ("" === modelo.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Modelo inválido",
-      });
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "O modelo é obrigatório",
-    });
+  if (!modelo || modelo.toString().trim().length === 0) {
+    errors.push("O modelo é obrigatório");
   }
 
-  if (quilometragem) {
-    if (isNaN(quilometragem)) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "O valor da quilometragem é inválido",
-      });
-    }
-  } else {
+  if (!quilometragem) {
     delete salvar.quilometragem;
+  } else {
+    if (isNaN(quilometragem))
+      errors.push("O valor da quilometragem é inválido");
   }
 
-  if (cnh_requerida) {
-    const cat = cnh_requerida.toUpperCase();
-    if (!["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"].includes(cat)) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem:
-          "Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]",
-      });
-    }
-    salvar.cnh_requerida = cat;
+  if (!cnh_requerida) {
+    errors.push("A CNH requerida é obrigatória");
   } else {
+    const cat = cnh_requerida.toUpperCase();
+    if (!["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"].includes(cat))
+      errors.push(
+        "Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]"
+      );
+    salvar.cnh_requerida = cat;
+  }
+
+  if (errors.length > 0) {
     return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "A CNH requerida para esse veículo é obrigatória",
+      mensagem: "Parâmetro(s) inválido(s)",
+      errors,
     });
   }
 
