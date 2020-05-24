@@ -44,9 +44,6 @@ app.use("/viagens", viagensRotas);
 app.use("/login", loginRotas);
 
 app.use(express.static(__dirname + "/doc"));
-// app.get("/doc", (req, res) => {
-//   res.render("index.html");
-// });
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
