@@ -73,8 +73,8 @@ exports.get_revisoes = (req, res, next) => {
                     [Op.and]: [
                       // IF momento == null => !realizada && revisao.quilometragem <= veiculo.quilometragem
                       {
-                        momento: {
-                          [Op.is]: null,
+                        quilometragem: {
+                          [Op.not]: null,
                         },
                       },
                       {
