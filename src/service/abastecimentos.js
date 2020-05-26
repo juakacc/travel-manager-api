@@ -50,69 +50,69 @@ exports.get_by_id = (req, res) => {
 exports.save = async (req, res) => {
   const veiculo = req.params.veiculoId;
   const { quilometragem, quantidade, tipo } = req.body;
+  let update_km = false;
+  const errors = [];
 
   if (veiculo) {
     const veiculoBD = await Veiculo.findByPk(veiculo);
 
-    if (!veiculoBD)
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Veículo inexistente",
-      });
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "O veículo é obrigatório",
-    });
-  }
-
-  if (quilometragem) {
-    if (isNaN(quilometragem)) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "O valor da quilometragem é inválido",
-      });
+    if (!veiculoBD) {
+      errors.push("Veículo inexistente");
+    } else {
+      if (veiculoBD.quilometragem < quilometragem) update_km = true;
     }
   } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "A quilometragem é obrigatória",
-    });
+    errors.push("O veículo é obrigatório");
   }
 
-  if (quantidade) {
-    if (isNaN(quantidade)) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "O valor da quantidade é inválido",
-      });
-    }
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "A quantidade é obrigatória",
-    });
+  if (isNaN(quilometragem)) {
+    errors.push("O valor da quilometragem é inválido");
+  }
+
+  if (isNaN(quantidade) || parseFloat(quantidade) === 0) {
+    errors.push("O valor da quantidade é inválido");
   }
 
   // Validar tipos [gasolina, diesel...]
-  if (tipo) {
-    if (tipo.trim().length === 0) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Tipo de combustível inválido",
-      });
-    }
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "Tipo de combustível é obrigatório",
-    });
+  if (!tipo || tipo.toString().trim().length === 0) {
+    errors.push("Tipo de combustível inválido");
   }
+
+  if (errors.length > 0)
+    return res.status(HttpStatus.BAD_REQUEST).json({
+      mensagem: "Parâmetro(s) inválido(s)",
+      errors,
+    });
 
   const salvar = {
     quilometragem,
     quantidade,
     tipo,
-    momento: new Date(),
+    momento: new Date(), // verificar fuso
     id_veiculo: veiculo,
     id_responsavel: req.userData.id,
   };
 
   Abastecimento.create(salvar)
     .then((abastecimento) => {
-      return res.status(HttpStatus.CREATED).json(abastecimento);
+      if (update_km) {
+        Veiculo.update(
+          { quilometragem },
+          {
+            where: {
+              id: veiculo,
+            },
+          }
+        )
+          .then(() => {
+            return res.status(HttpStatus.CREATED).json(abastecimento);
+          })
+          .catch(() => {
+            return res.status(HttpStatus.CREATED).json(abastecimento);
+          });
+      } else {
+        return res.status(HttpStatus.CREATED).json(abastecimento);
+      }
     })
     .catch((err) => {
       console.log(err);
