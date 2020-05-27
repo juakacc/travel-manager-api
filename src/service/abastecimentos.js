@@ -65,7 +65,7 @@ exports.save = async (req, res) => {
     errors.push("O veículo é obrigatório");
   }
 
-  if (isNaN(quilometragem)) {
+  if (isNaN(quilometragem) || quilometragem == 0) {
     errors.push("O valor da quilometragem é inválido");
   }
 

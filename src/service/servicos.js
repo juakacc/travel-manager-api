@@ -140,17 +140,22 @@ exports.delete = async (req, res) => {
 
 const save_servico = async (req, res, id_veiculo, servico) => {
   const { quilometragem, descricao, revisao } = servico;
+  let update_km = false;
   const errors = [];
 
   if (id_veiculo) {
     const veiculoBD = await Veiculo.findByPk(id_veiculo);
 
-    if (!veiculoBD) errors.push("Veículo inexistente");
+    if (!veiculoBD) {
+      errors.push("Veículo inexistente");
+    } else {
+      if (veiculoBD.quilometragem < quilometragem) update_km = true;
+    }
   } else {
     errors.push("O veículo é obrigatório");
   }
 
-  if (isNaN(quilometragem)) {
+  if (isNaN(quilometragem) || quilometragem == 0) {
     errors.push("O valor da quilometragem é inválido");
   }
 
@@ -159,7 +164,7 @@ const save_servico = async (req, res, id_veiculo, servico) => {
   }
 
   if (revisao) {
-    errors.push(...validar_revisao(revisao));
+    errors.push(...validar_revisao(revisao, quilometragem));
   }
 
   if (errors.length > 0) {
@@ -172,15 +177,24 @@ const save_servico = async (req, res, id_veiculo, servico) => {
   Servico.create({
     quilometragem,
     descricao,
-    momento: new Date(),
+    momento: new Date(), // Validar fuso of server
     id_veiculo,
     id_responsavel: req.userData.id,
   })
     .then((servico) => {
-      if (revisao) {
-        return save_revisao(res, servico, revisao);
+      if (update_km) {
+        Veiculo.update(
+          { quilometragem },
+          {
+            where: {
+              id: id_veiculo,
+            },
+          }
+        )
+          .then(() => finish_save(res, servico, revisao))
+          .catch(() => finish_save(res, servico, revisao));
       } else {
-        return res.status(HttpStatus.CREATED).json(servico);
+        return finish_save(res, servico, revisao);
       }
     })
     .catch((err) => {
@@ -189,6 +203,14 @@ const save_servico = async (req, res, id_veiculo, servico) => {
         mensagem: err,
       });
     });
+};
+
+const finish_save = (res, servico, revisao) => {
+  if (revisao) {
+    return save_revisao(res, servico, revisao);
+  } else {
+    return res.status(HttpStatus.CREATED).json(servico);
+  }
 };
 
 const save_revisao = (res, servico, revisao) => {
@@ -213,7 +235,7 @@ const save_revisao = (res, servico, revisao) => {
     });
 };
 
-const validar_revisao = (revisao) => {
+const validar_revisao = (revisao, quilometragem) => {
   const errors = [];
   const { descricao: d, momento: m, quilometragem: q } = revisao;
 
@@ -221,12 +243,17 @@ const validar_revisao = (revisao) => {
     errors.push("Informe uma descrição para a revisão");
   }
 
-  if (!m && isNaN(q)) {
+  if (!m && !q) {
     errors.push("A quilometragem ou momento deve ser informado");
   }
 
-  if (isNaN(q)) {
-    errors.push("A quilometragem da revisão é inválida");
+  if (q) {
+    if (isNaN(q)) {
+      errors.push("A quilometragem da revisão é inválida");
+    } else {
+      if (q <= quilometragem)
+        errors.push("Quilometragem da revisão anterior a do serviço");
+    }
   }
 
   if (m && !validar_data(m)) {
