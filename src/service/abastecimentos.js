@@ -1,4 +1,5 @@
 const HttpStatus = require("http-status-codes");
+const moment = require("moment");
 const Veiculo = require("../models").veiculo;
 const Abastecimento = require("../models").abastecimento;
 
@@ -84,14 +85,17 @@ exports.save = async (req, res) => {
       errors,
     });
 
+  const momento = moment().utcOffset(-180).format("YYYY-MM-DD HH:mm:ss");
+
   const salvar = {
     quilometragem,
     quantidade,
     tipo,
-    momento: new Date(), // verificar fuso
+    momento,
     id_veiculo: veiculo,
     id_responsavel: req.userData.id,
   };
+  console.log(moment().format());
 
   Abastecimento.create(salvar)
     .then((abastecimento) => {

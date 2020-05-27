@@ -174,10 +174,12 @@ const save_servico = async (req, res, id_veiculo, servico) => {
     });
   }
 
+  const momento = moment().utcOffset(-180).format("YYYY-MM-DD HH:mm:ss");
+
   Servico.create({
     quilometragem,
     descricao,
-    momento: new Date(), // Validar fuso of server
+    momento,
     id_veiculo,
     id_responsavel: req.userData.id,
   })

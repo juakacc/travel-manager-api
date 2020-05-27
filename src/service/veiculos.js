@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 const HttpStatus = require("http-status-codes");
+const moment = require("moment");
 
 const Veiculo = require("../models").veiculo;
 const Servico = require("../models").servico;
@@ -94,7 +95,9 @@ exports.get_revisoes = (req, res, next) => {
                       },
                       {
                         momento: {
-                          [Op.lte]: new Date(), // ATUAL - Verificar no fusohorário do server
+                          [Op.lte]: moment()
+                            .utcOffset(-180)
+                            .format("YYYY-MM-DD HH:mm:ss"), // ATUAL - Verificar no fusohorário do server
                         },
                       },
                     ],
