@@ -6,14 +6,14 @@ const constantes = require("../constantes");
 
 exports.get_all = (req, res, next) => {
   Motorista.findAll()
-    .then(motoristas => {
-      const result = motoristas.map(motorista => {
+    .then((motoristas) => {
+      const result = motoristas.map((motorista) => {
         delete motorista.dataValues.senha;
         return motorista;
       });
       res.status(HttpStatus.OK).json(result);
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno no servidor",
@@ -25,17 +25,17 @@ exports.get_by_id = (req, res, next) => {
   const id = req.params.motoristaId;
 
   Motorista.findByPk(id)
-    .then(motorista => {
+    .then((motorista) => {
       if (!motorista) {
         res.status(HttpStatus.NOT_FOUND).json({
           mensagem: "Motorista não encontrado",
         });
       } else {
         Permissao.findAll({
-          where: {id_motorista: id},
+          where: { id_motorista: id },
         })
-          .then(per => {
-            const permissoes = per.map(item => {
+          .then((per) => {
+            const permissoes = per.map((item) => {
               return item.dataValues.permissao;
             });
             motorista.dataValues.permissoes =
@@ -43,14 +43,14 @@ exports.get_by_id = (req, res, next) => {
             delete motorista.dataValues.senha;
             res.status(HttpStatus.OK).json(motorista.dataValues);
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err);
             delete motorista.dataValues.senha;
             res.status(HttpStatus.OK).json(motorista.dataValues);
           });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno no servidor",
@@ -59,7 +59,16 @@ exports.get_by_id = (req, res, next) => {
 };
 
 exports.salvar = async (req, res, next) => {
-  const {nome, apelido, cnh, categoria, telefone, senha, permissoes} = req.body;
+  const {
+    nome,
+    apelido,
+    cnh,
+    categoria,
+    telefone,
+    senha,
+    permissoes,
+  } = req.body;
+  const errors = [];
 
   const salvar = {
     nome,
@@ -71,104 +80,64 @@ exports.salvar = async (req, res, next) => {
     permissoes,
   };
 
-  if (nome) {
-    if ("" === nome.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Nome inválido",
-      });
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "O nome é obrigatório",
-    });
-  }
+  if (!nome || nome.toString().trim().length === 0)
+    errors.push("O nome é obrigatório");
 
-  if (apelido) {
-    if ("" === apelido.trim()) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Apelido inválido",
-      });
-    } else {
-      const aux = await Motorista.findAll({
-        where: {apelido},
-      });
-      if (aux.length > 0) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          mensagem: "O apelido já está em uso",
-        });
-      }
-      salvar.apelido = apelido.toLowerCase();
+  if (!apelido || apelido.toString().trim().length === 0) {
+    errors.push("O apelido é obrigatório");
+  } else {
+    const aux = await Motorista.findAll({
+      where: { apelido },
+    });
+    if (aux.length > 0) {
+      errors.push("O apelido já está em uso");
     }
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "O apelido é obrigatório",
-    });
+    salvar.apelido = apelido.toLowerCase();
   }
 
-  if (senha) {
-    if ("" === senha.trim()) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Senha inválida",
-      });
-    } else {
-      const salt = bcrypt.genSaltSync(10);
-      const senhaEnc = bcrypt.hashSync(senha, salt);
-      salvar.senha = senhaEnc;
-    }
+  if (!senha || senha.toString().trim().length < 6) {
+    errors.push("A senha é inválida");
   } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "A senha é obrigatória",
-    });
+    const salt = bcrypt.genSaltSync(10);
+    const senhaEnc = bcrypt.hashSync(senha, salt);
+    salvar.senha = senhaEnc;
   }
 
-  if (telefone) {
-    if ("" === telefone.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Telefone inválido",
-      });
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "O telefone é obrigatório",
-    });
-  }
+  if (!telefone || telefone.toString().trim().length === 0)
+    errors.push("O telefone é inválido");
 
-  if (categoria) {
+  if (!categoria) {
+    errors.push("A categoria da CNH é obrigatória");
+  } else {
     const cat = categoria.toUpperCase();
     if (!["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"].includes(cat)) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem:
-          "Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]",
-      });
+      errors.push(
+        "Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]"
+      );
     }
     salvar.categoria = cat;
-  } else {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "A categoria da CNH é obrigatória",
-    });
   }
 
-  if (cnh) {
-    if ("" === cnh.trim()) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Número da CNH inválido",
-      });
-    } else {
-      const aux = await Motorista.findAll({
-        where: {cnh},
-      });
-      if (aux.length > 0) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          mensagem: "A CNH informada já está cadastrada",
-        });
-      }
-    }
+  if (!cnh || cnh.toString().trim().length === 0) {
+    errors.push("Número da CNH inválido");
   } else {
+    const aux = await Motorista.findAll({
+      where: { cnh },
+    });
+    if (aux.length > 0) {
+      errors.push("A CNH informada já está cadastrada");
+    }
+  }
+
+  if (errors.length > 0) {
     return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "O número da CNH é obrigatório",
+      mensagem: "Parâmetro(s) inválido(s)",
+      errors,
     });
   }
 
   Motorista.create(salvar)
-    .then(motorista => {
+    .then((motorista) => {
       delete motorista.dataValues.senha;
 
       Permissao.create({
@@ -184,7 +153,7 @@ exports.salvar = async (req, res, next) => {
       }
       return res.status(HttpStatus.CREATED).json(motorista.dataValues);
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno do servidor",
@@ -194,13 +163,12 @@ exports.salvar = async (req, res, next) => {
 
 exports.editar = async (req, res, next) => {
   const id = req.params.motoristaId;
-  const {nome, apelido, cnh, categoria, telefone} = req.body;
+  const { nome, apelido, cnh, categoria, telefone } = req.body;
+  const errors = [];
 
   const motoristaBD = await Motorista.findByPk(id);
   if (!motoristaBD) {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "Motorista não encontrado",
-    });
+    errors.push("Motorista não encontrado");
   }
 
   if (!req.userData.roles.includes(constantes.ADMIN) && req.userData.id != id) {
@@ -217,29 +185,22 @@ exports.editar = async (req, res, next) => {
     telefone,
   };
 
-  if (nome) {
-    if ("" === nome.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Nome inválido",
-      });
+  if (nome && nome.toString().trim().length === 0) {
+    errors.push("Nome inválido");
   } else {
     delete salvar.nome;
   }
 
   if (apelido) {
-    if ("" === apelido.trim()) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Apelido inválido",
-      });
+    if (apelido.toString().trim().length === 0) {
+      errors.push("Apelido inválido");
     } else {
       const motorista = await Motorista.findAll({
-        where: {apelido},
+        where: { apelido },
       });
       if (motorista.length > 0) {
         if (motorista[0].id != id) {
-          return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: "O apelido já está em uso",
-          });
+          errors.push("O apelido já está em uso");
         }
       }
       salvar.apelido = apelido.toLowerCase();
@@ -248,41 +209,35 @@ exports.editar = async (req, res, next) => {
     delete salvar.apelido;
   }
 
-  if (telefone) {
-    if ("" === telefone.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Telefone inválido",
-      });
+  if (telefone && telefone.toString().trim().length === 0) {
+    errors.push("Telefone inválido");
   } else {
     delete salvar.telefone;
   }
 
   if (categoria) {
     const cat = categoria.toUpperCase();
-    if (!["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"].includes(cat))
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem:
-          "Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]",
-      });
-    salvar.categoria = cat;
+    if (!["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"].includes(cat)) {
+      errors.push(
+        "Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]"
+      );
+    } else {
+      salvar.categoria = cat;
+    }
   } else {
     delete salvar.categoria;
   }
 
   if (cnh) {
-    if ("" === cnh.trim()) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Número da CNH inválido",
-      });
+    if (cnh.toString().trim().length === 0) {
+      errors.push("Número da CNH inválido");
     } else {
       const motorista = await Motorista.findAll({
-        where: {cnh},
+        where: { cnh },
       });
       if (motorista.length > 0) {
         if (motorista[0].id != id) {
-          return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: "A CNH informada já está em uso",
-          });
+          errors.push("A CNH informada já está em uso");
         }
       }
     }
@@ -290,23 +245,30 @@ exports.editar = async (req, res, next) => {
     delete salvar.cnh;
   }
 
+  if (errors.length > 0) {
+    return res.status(HttpStatus.BAD_REQUEST).json({
+      mensagem: "Parâmetro(s) inválido(s)",
+      errors,
+    });
+  }
+
   Motorista.update(salvar, {
-    where: {id},
+    where: { id },
   })
     .then(() => {
       Motorista.findByPk(id)
-        .then(motorista2 => {
+        .then((motorista2) => {
           delete motorista2.dataValues.senha;
           return res.status(HttpStatus.OK).json(motorista2.dataValues);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
           return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             mensagem: "Erro interno no servidor",
           });
         });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno do servidor",
@@ -318,12 +280,12 @@ exports.deletar = (req, res, next) => {
   const id = req.params.motoristaId;
 
   Motorista.destroy({
-    where: {id},
+    where: { id },
   })
     .then(() => {
       res.status(HttpStatus.NO_CONTENT).send();
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: err,
       });
