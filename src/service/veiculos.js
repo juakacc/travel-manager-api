@@ -238,12 +238,10 @@ exports.editar = async (req, res, next) => {
     quilometragem,
     cnh_requerida,
   } = req.body;
+  const errors = [];
 
   const veiculoBD = await Veiculo.findByPk(id);
-  if (!veiculoBD)
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "Veículo não encontrado",
-    });
+  if (!veiculoBD) errors.push("Veículo não encontrado");
 
   const salvar = {
     nome,
@@ -255,83 +253,68 @@ exports.editar = async (req, res, next) => {
     cnh_requerida,
   };
 
-  if (nome) {
-    if ("" === nome.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Nome inválido",
-      });
+  if (nome && nome.toString().trim().length === 0) {
+    errors.push("Nome inválido");
   } else {
     delete salvar.nome;
   }
 
   if (placa) {
-    if ("" === placa.trim()) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Placa inválida",
-      });
+    if (placa.toString().trim().length === 0) {
+      errors.push("Placa inválida");
     } else {
       const veiculo = await Veiculo.findAll({
         where: { placa },
       });
       if (veiculo.length > 0)
         if (veiculo[0].id != id)
-          return res.status(HttpStatus.BAD_REQUEST).json({
-            mensagem: "A placa informada já está cadastrada",
-          });
+          errors.push("A placa informada já está cadastrada");
     }
   } else {
     delete salvar.placa;
   }
 
-  if (renavam) {
-    if ("" === renavam.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Renavam inválido",
-      });
+  if (renavam && renavam.toString().trim().length === 0) {
+    errors.push("Renavam inválido");
   } else {
     delete salvar.renavam;
   }
 
-  if (marca) {
-    if ("" === marca.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Marca inválida",
-      });
+  if (marca && marca.toString().trim().length === 0) {
+    errors.push("Marca inválida");
   } else {
     delete salvar.marca;
   }
 
-  if (modelo) {
-    if ("" === modelo.trim())
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "Modelo inválido",
-      });
+  if (modelo && modelo.toString().trim().length === 0) {
+    errors.push("Modelo inválido");
   } else {
     delete salvar.modelo;
   }
 
   if (quilometragem) {
-    if (isNaN(quilometragem)) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "O valor da quilometragem é inválido",
-      });
-    }
+    if (isNaN(quilometragem))
+      errors.push("O valor da quilometragem é inválido");
   } else {
     delete salvar.quilometragem;
   }
 
   if (cnh_requerida) {
     const cat = cnh_requerida.toUpperCase();
-    if (!["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"].includes(cat)) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem:
-          "Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]",
-      });
-    }
+    if (!["A", "B", "C", "D", "E", "AB", "AC", "AD", "AE"].includes(cat))
+      errors.push(
+        "Categoria da CNH inválida. Valores aceitos: [A, B, C, D, E, AB, AC, AD, AE]"
+      );
     salvar.cnh_requerida = cat;
   } else {
     delete salvar.cnh_requerida;
   }
+
+  if (errors.length > 0)
+    return res.status(HttpStatus.BAD_REQUEST).json({
+      mensagem: "Parâmetro(s) inválido(s)",
+      errors,
+    });
 
   Veiculo.update(salvar, {
     where: { id },
