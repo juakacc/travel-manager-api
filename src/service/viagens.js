@@ -427,7 +427,7 @@ exports.concluir = async (req, res) => {
     });
 };
 
-exports.deletar = async (req, res, next) => {
+exports.deletar = async (req, res) => {
   const id = req.params.viagemId;
 
   const viagem = await Viagem.findByPk(id);
@@ -440,28 +440,32 @@ exports.deletar = async (req, res, next) => {
   const motoristaId = viagem.dataValues.id_motorista;
   const nao_concluida = viagem.dataValues.chegada == null;
 
-  Viagem.destroy({
-    where: { id },
-  })
-    .then((rows) => {
-      if (rows > 0) {
-        if (nao_concluida) {
-          Veiculo.update(
-            {
-              disponivel: true,
-            },
-            { where: { id: veiculoId } }
-          );
-
-          Motorista.update(
-            {
-              disponivel: true,
-            },
-            { where: { id: motoristaId } }
-          );
+  return models.sequelize
+    .transaction((t) => {
+      return Viagem.destroy({
+        where: { id },
+        transaction: t,
+      }).then((rows) => {
+        if (rows > 0 && nao_concluida) {
+          return Promise.all([
+            Veiculo.update(
+              {
+                disponivel: true,
+              },
+              { where: { id: veiculoId }, transaction: t }
+            ),
+            Motorista.update(
+              {
+                disponivel: true,
+              },
+              { where: { id: motoristaId }, transaction: t }
+            ),
+          ]);
         }
-      }
-      res.status(HttpStatus.NO_CONTENT).send();
+      });
+    })
+    .then(() => {
+      return res.status(HttpStatus.NO_CONTENT).send();
     })
     .catch((err) => {
       console.log(err);
