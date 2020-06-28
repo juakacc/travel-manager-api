@@ -107,6 +107,72 @@ router.get(
 );
 
 /**
+ * @api {get} /viagens/atual Recupera a viagem atual de um motorista, caso exista
+ * @apiName getViagemMotorista
+ * @apiGroup Viagens
+ *
+ * @apiUse Header
+ *
+ * @apiParam {Number} motoristaId Id do motorista
+ *
+ * @apiSuccess {Number} id          Id da viagem
+ * @apiSuccess {String} saida       Momento do início da viagem
+ * @apiSuccess {Number} km_inicial  Quilometragem inicial do veículo
+ * @apiSuccess {String} [descricao] Descrição sobre a viagem
+ *
+ * @apiUse Veiculo
+ * @apiUse Motorista
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    HTTP/1.1 200 OK
+ *    {
+ *      "id": 1,
+ *      "saida": "2020-03-22 11:19:00",
+ *      "km_inicial": 20000,
+ *      "descricao": null,
+ *      "veiculo": {
+ *        "id": 1,
+ *        "nome": "GOL-02",
+ *        "placa": "QFI-1929",
+ *        "renavam": "0982374987",
+ *        "marca": "Volks",
+ *        "modelo": "Gol",
+ *        "quilometragem": "20300",
+ *        "disponivel": false,
+ *        "cnh_requerida": "B"
+ *      },
+ *      "motorista": {
+ *        "id": 1,
+ *        "nome": "João Souza",
+ *        "apelido": "joao",
+ *        "cnh": "1234234",
+ *        "categoria": "AB",
+ *        "telefone": "999229933",
+ *        "disponivel": false
+ *      }
+ *    }
+ *
+ * @apiError ViagemNotFound O motorista não tem nenhuma viagem em andamento.
+ *
+ * @apiErrorExample Error-Response:
+ *    HTTP/1.1 404 Not Found
+ *    {
+ *      "mensagem": "Viagem não encontrada",
+ *    }
+ */
+router.get(
+  "/atual",
+  (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA),
+  viagens.get_atual_by_motorista
+);
+// Manter compatível
+router.get(
+  "/atual/:id",
+  (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA),
+  viagens.get_atual_by_motorista
+);
+
+/**
  * @api {get} /viagens/:viagemId Recupera uma viagem específica
  * @apiName getViagem
  * @apiGroup Viagens
@@ -168,66 +234,6 @@ router.get(
   "/:viagemId",
   (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA),
   viagens.get_by_id
-);
-
-/**
- * @api {get} /viagens/atual/:motoristaId Recupera a viagem atual de um motorista, caso exista
- * @apiName getViagemMotorista
- * @apiGroup Viagens
- *
- * @apiUse Header
- *
- * @apiParam {Number} motoristaId Id do motorista
- *
- * @apiSuccess {Number} id          Id da viagem
- * @apiSuccess {String} saida       Momento do início da viagem
- * @apiSuccess {Number} km_inicial  Quilometragem inicial do veículo
- * @apiSuccess {String} [descricao] Descrição sobre a viagem
- *
- * @apiUse Veiculo
- * @apiUse Motorista
- *
- * @apiSuccessExample {json} Success-Response:
- *    HTTP/1.1 200 OK
- *    {
- *      "id": 1,
- *      "saida": "2020-03-22 11:19:00",
- *      "km_inicial": 20000,
- *      "descricao": null,
- *      "veiculo": {
- *        "id": 1,
- *        "nome": "GOL-02",
- *        "placa": "QFI-1929",
- *        "renavam": "0982374987",
- *        "marca": "Volks",
- *        "modelo": "Gol",
- *        "quilometragem": "20300",
- *        "disponivel": false,
- *        "cnh_requerida": "B"
- *      },
- *      "motorista": {
- *        "id": 1,
- *        "nome": "João Souza",
- *        "apelido": "joao",
- *        "cnh": "1234234",
- *        "categoria": "AB",
- *        "telefone": "999229933",
- *        "disponivel": false
- *      }
- *    }
- *
- * @apiError ViagemNotFound O motorista não tem nenhuma viagem em andamento.
- *
- * @apiErrorExample Error-Response:
- *    HTTP/1.1 404 Not Found
- *    {
- *      "mensagem": "Viagem não encontrada",
- *    }
- */
-router.get(
-  "/atual/:motoristaId",
-  (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA),
-  viagens.get_atual_by_motorista
 );
 
 /**

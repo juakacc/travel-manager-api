@@ -191,7 +191,7 @@ exports.get_by_id = async (req, res, next) => {
 };
 
 exports.get_atual_by_motorista = (req, res, next) => {
-  const { motoristaId } = req.params;
+  const motoristaId = req.userData.id;
 
   Viagem.findAll({
     where: {
@@ -218,7 +218,8 @@ exports.get_atual_by_motorista = (req, res, next) => {
 };
 
 exports.iniciar = async (req, res, next) => {
-  const { saida, km_inicial, descricao, veiculo, motorista } = req.body;
+  const { saida, km_inicial, descricao, veiculo } = req.body;
+  const motorista = req.userData.id;
   const errors = [];
 
   const veiculoBD = await Veiculo.findByPk(veiculo);
@@ -232,12 +233,7 @@ exports.iniciar = async (req, res, next) => {
 
   const motoristaBD = await Motorista.findByPk(motorista);
 
-  if (!motoristaBD) {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "Motorista inexistente",
-    });
-  } else if (!motoristaBD.dataValues.disponivel)
-    errors.push("Motorista indisponível");
+  if (!motoristaBD.dataValues.disponivel) errors.push("Motorista indisponível");
 
   const salvar = {
     saida,
