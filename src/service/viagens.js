@@ -1,9 +1,11 @@
 const HttpStatus = require("http-status-codes");
 const sequelize = require("sequelize");
 const Op = sequelize.Op;
-const Veiculo = require("../models").veiculo;
-const Motorista = require("../models").motorista;
-const Viagem = require("../models").viagem;
+
+const models = require("../models");
+const Veiculo = models.veiculo;
+const Motorista = models.motorista;
+const Viagem = models.viagem;
 
 const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/;
 const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo
@@ -48,7 +50,7 @@ const checkCNH = (motorista, veiculo) => {
   }
 };
 
-exports.get = (req, res, next) => {
+exports.get = (req, res) => {
   const { date, status } = req.query;
 
   if (status) {
@@ -170,22 +172,21 @@ exports.get = (req, res, next) => {
   }
 };
 
-exports.get_by_id = async (req, res, next) => {
+exports.get_by_id = async (req, res) => {
   Viagem.findByPk(req.params.viagemId, {
     include: [Veiculo, Motorista],
   })
     .then((viagem) => {
-      if (!viagem) {
+      if (!viagem)
         return res.status(HttpStatus.NOT_FOUND).json({
           mensagem: "Viagem não encontrada",
         });
-      } else {
-        res.status(HttpStatus.OK).json(convertViagem(viagem));
-      }
+      res.status(HttpStatus.OK).json(convertViagem(viagem));
     })
     .catch((err) => {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        mensagem: err,
+      console.log(err);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        mensagem: "Ocorreu um erro interno no servidor",
       });
     });
 };
@@ -193,7 +194,7 @@ exports.get_by_id = async (req, res, next) => {
 exports.get_atual_by_motorista = (req, res, next) => {
   const motoristaId = req.userData.id;
 
-  Viagem.findAll({
+  Viagem.findOne({
     where: {
       id_motorista: motoristaId,
       chegada: {
@@ -202,22 +203,22 @@ exports.get_atual_by_motorista = (req, res, next) => {
     },
     include: [Veiculo, Motorista],
   })
-    .then((viagens) => {
-      if (viagens.length == 0) {
+    .then((viagem) => {
+      if (!viagem)
         return res.status(HttpStatus.NOT_FOUND).json({
           mensagem: "Viagem não encontrada",
         });
-      }
-      return res.status(HttpStatus.OK).json(convertViagem(viagens[0]));
+      return res.status(HttpStatus.OK).json(convertViagem(viagem));
     })
     .catch((err) => {
+      console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Ocorreu um erro interno no servidor",
       });
     });
 };
 
-exports.iniciar = async (req, res, next) => {
+exports.iniciar = async (req, res) => {
   const { saida, km_inicial, descricao, veiculo } = req.body;
   const motorista = req.userData.id;
   const errors = [];
@@ -276,42 +277,43 @@ exports.iniciar = async (req, res, next) => {
       errors,
     });
 
-  Viagem.create(salvar)
-    .then((viagem) => {
-      Veiculo.update(
-        {
-          disponivel: false,
-        },
-        { where: { id: veiculo } }
-      );
-
-      Motorista.update(
-        {
-          disponivel: false,
-        },
-        { where: { id: motorista } }
-      );
-
-      Viagem.findByPk(viagem.id, {
-        include: [Veiculo, Motorista],
-      })
-        .then((viagem) => {
-          res.status(HttpStatus.CREATED).json(convertViagem(viagem));
-        })
-        .catch((err) => {
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            mensagem: err,
-          });
+  return models.sequelize
+    .transaction((t) => {
+      return Viagem.create(salvar, { transaction: t }).then((viagemSalva) => {
+        return Promise.all([
+          Veiculo.update(
+            {
+              disponivel: false,
+            },
+            { where: { id: veiculo }, transaction: t }
+          ),
+          Motorista.update(
+            {
+              disponivel: false,
+            },
+            { where: { id: motorista }, transaction: t }
+          ),
+        ]).then(() => {
+          return viagemSalva;
         });
+      });
+    })
+    .then((viagemSalva) => {
+      return Viagem.findByPk(viagemSalva.id, {
+        include: [Veiculo, Motorista],
+      }).then((viagem) => {
+        return res.status(HttpStatus.CREATED).json(convertViagem(viagem));
+      });
     })
     .catch((err) => {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: err,
+      console.log(err);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        mensagem: "Ocorreu um erro interno no servidor",
       });
     });
 };
 
-exports.concluir = async (req, res, next) => {
+exports.concluir = async (req, res) => {
   const { viagemId } = req.params;
   const errors = [];
 
@@ -384,40 +386,43 @@ exports.concluir = async (req, res, next) => {
       errors,
     });
 
-  Viagem.update(salvar, { where: { id: viagemId } })
-    .then(() => {
-      Viagem.findByPk(viagemId, {
-        include: [Veiculo, Motorista],
-      })
-        .then((viagem) => {
-          Veiculo.update(
-            {
-              disponivel: true,
-              quilometragem: salvar.km_final,
-            },
-            { where: { id: viagem.dataValues.id_veiculo } }
-          );
-
-          Motorista.update(
-            {
-              disponivel: true,
-            },
-            { where: { id: viagem.dataValues.id_motorista } }
-          );
-
-          return res.status(HttpStatus.OK).json(convertViagem(viagem));
-        })
-        .catch((err) => {
-          console.log(err);
-          return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            mensagem: err,
+  return models.sequelize
+    .transaction((t) => {
+      return Viagem.update(salvar, {
+        where: { id: viagemId },
+        transaction: t,
+      }).then(() => {
+        return Viagem.findByPk(viagemId, {
+          include: [Veiculo, Motorista],
+          transaction: t,
+        }).then((viagem) => {
+          return Promise.all([
+            Veiculo.update(
+              {
+                disponivel: true,
+                quilometragem: salvar.km_final,
+              },
+              { where: { id: viagem.dataValues.id_veiculo }, transaction: t }
+            ),
+            Motorista.update(
+              {
+                disponivel: true,
+              },
+              { where: { id: viagem.dataValues.id_motorista }, transaction: t }
+            ),
+          ]).then(() => {
+            return viagem;
           });
         });
+      });
+    })
+    .then((viagem) => {
+      return res.status(HttpStatus.OK).json(convertViagem(viagem));
     })
     .catch((err) => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        mensagem: err,
+        mensagem: "Ocorreu um erro interno no servidor",
       });
     });
 };
@@ -459,8 +464,9 @@ exports.deletar = async (req, res, next) => {
       res.status(HttpStatus.NO_CONTENT).send();
     })
     .catch((err) => {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        mensagem: err,
+      console.log(err);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        mensagem: "Ocorreu um erro interno no servidor",
       });
     });
 };
