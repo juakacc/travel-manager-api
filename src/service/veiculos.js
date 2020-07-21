@@ -9,10 +9,10 @@ const Revisao = require("../models").servico_revisao;
 
 exports.get_all = (req, res, next) => {
   Veiculo.findAll()
-    .then((veiculos) => {
+    .then(veiculos => {
       res.status(HttpStatus.OK).json(veiculos);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno no servidor",
@@ -22,12 +22,12 @@ exports.get_all = (req, res, next) => {
 
 exports.get_disponiveis = (req, res, next) => {
   Veiculo.findAll({
-    where: { disponivel: true },
+    where: {disponivel: true},
   })
-    .then((veiculos) => {
+    .then(veiculos => {
       res.status(HttpStatus.OK).json(veiculos);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno no servidor",
@@ -39,7 +39,7 @@ exports.get_by_id = (req, res, next) => {
   const id = req.params.veiculoId;
 
   Veiculo.findByPk(id)
-    .then((veiculo) => {
+    .then(veiculo => {
       if (!veiculo) {
         return res.status(HttpStatus.NOT_FOUND).json({
           mensagem: "Veiculo não encontrado",
@@ -48,7 +48,7 @@ exports.get_by_id = (req, res, next) => {
         return res.status(HttpStatus.OK).json(veiculo.dataValues);
       }
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno no servidor",
@@ -60,7 +60,7 @@ exports.get_revisoes = (req, res, next) => {
   const id = req.params.veiculoId;
 
   Veiculo.findByPk(id)
-    .then((veiculo) => {
+    .then(veiculo => {
       if (veiculo) {
         Revisao.findAll({
           where: {
@@ -115,10 +115,10 @@ exports.get_revisoes = (req, res, next) => {
           },
           attributes: ["id", "quilometragem", "descricao", "momento"],
         })
-          .then((revisoes) => {
+          .then(revisoes => {
             return res.status(HttpStatus.OK).json(revisoes);
           })
-          .catch((err) => {
+          .catch(err => {
             console.log(err);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
               mensagem: "Erro interno no servidor",
@@ -130,7 +130,7 @@ exports.get_revisoes = (req, res, next) => {
         });
       }
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno no servidor",
@@ -169,7 +169,7 @@ exports.salvar = async (req, res) => {
     errors.push("A placa é obrigatória");
   } else {
     const veiculo = await Veiculo.findAll({
-      where: { placa },
+      where: {placa},
     });
     if (veiculo.length > 0) {
       errors.push("A placa informada já está cadastrada");
@@ -216,10 +216,10 @@ exports.salvar = async (req, res) => {
   }
 
   Veiculo.create(salvar)
-    .then((veiculo) => {
+    .then(veiculo => {
       res.status(HttpStatus.CREATED).json(veiculo.dataValues);
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: err,
@@ -253,8 +253,10 @@ exports.editar = async (req, res, next) => {
     cnh_requerida,
   };
 
-  if (nome && nome.toString().trim().length === 0) {
-    errors.push("Nome inválido");
+  if (nome) {
+    if (nome.toString().trim().length === 0) {
+      errors.push("Nome inválido");
+    }
   } else {
     delete salvar.nome;
   }
@@ -264,7 +266,7 @@ exports.editar = async (req, res, next) => {
       errors.push("Placa inválida");
     } else {
       const veiculo = await Veiculo.findAll({
-        where: { placa },
+        where: {placa},
       });
       if (veiculo.length > 0)
         if (veiculo[0].id != id)
@@ -274,20 +276,26 @@ exports.editar = async (req, res, next) => {
     delete salvar.placa;
   }
 
-  if (renavam && renavam.toString().trim().length === 0) {
-    errors.push("Renavam inválido");
+  if (renavam) {
+    if (renavam.toString().trim().length === 0) {
+      errors.push("Renavam inválido");
+    }
   } else {
     delete salvar.renavam;
   }
 
-  if (marca && marca.toString().trim().length === 0) {
-    errors.push("Marca inválida");
+  if (marca) {
+    if (marca.toString().trim().length === 0) {
+      errors.push("Marca inválida");
+    }
   } else {
     delete salvar.marca;
   }
 
-  if (modelo && modelo.toString().trim().length === 0) {
-    errors.push("Modelo inválido");
+  if (modelo) {
+    if (modelo.toString().trim().length === 0) {
+      errors.push("Modelo inválido");
+    }
   } else {
     delete salvar.modelo;
   }
@@ -317,21 +325,21 @@ exports.editar = async (req, res, next) => {
     });
 
   Veiculo.update(salvar, {
-    where: { id },
+    where: {id},
   })
     .then(() => {
       Veiculo.findByPk(id)
-        .then((veiculo) => {
+        .then(veiculo => {
           res.status(HttpStatus.OK).json(veiculo.dataValues);
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             mensagem: "Erro interno do servidor",
           });
         });
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: "Erro interno do servidor",
@@ -343,12 +351,12 @@ exports.deletar = (req, res, next) => {
   const id = req.params.veiculoId;
 
   Veiculo.destroy({
-    where: { id },
+    where: {id},
   })
     .then(() => {
       res.status(HttpStatus.NO_CONTENT).send();
     })
-    .catch((err) => {
+    .catch(err => {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         mensagem: err,
       });
