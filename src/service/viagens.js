@@ -340,6 +340,7 @@ exports.concluir = async (req, res) => {
       salvar.saida = s; // Date
     }
   } else {
+    console.log("VIAGEM: ", viagem.dataValues.saida);
     salvar.saida = new Date(viagem.dataValues.saida);
   }
 
