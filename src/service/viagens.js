@@ -205,15 +205,16 @@ exports.iniciar = async (req, res) => {
     id_motorista: motorista,
   };
 
-  if (
-    !checkCNH(
-      motoristaBD.dataValues.categoria,
-      veiculoBD.dataValues.cnh_requerida,
+  if (motoristaBD)
+    if (
+      !checkCNH(
+        motoristaBD.dataValues.categoria,
+        veiculoBD.dataValues.cnh_requerida,
+      )
     )
-  )
-    errors.push(
-      `Habilitação necessária: ${veiculoBD.dataValues.cnh_requerida}`,
-    );
+      errors.push(
+        `Habilitação necessária: ${veiculoBD.dataValues.cnh_requerida}`,
+      );
 
   if (!km_inicial || isNaN(km_inicial)) {
     errors.push('O valor da quilometragem é inválido');
@@ -387,18 +388,29 @@ exports.deletar = async (req, res) => {
 };
 
 const convertViagem = viagem => {
+  const {
+    id,
+    saida,
+    km_inicial,
+    chegada,
+    km_final,
+    descricao,
+    veiculo,
+    motoristum,
+  } = viagem.dataValues;
+
   const vi = {
-    id: viagem.dataValues.id,
-    saida: viagem.dataValues.saida,
-    km_inicial: viagem.dataValues.km_inicial,
-    chegada: viagem.dataValues.chegada,
-    km_final: viagem.dataValues.km_final,
-    descricao: viagem.dataValues.descricao,
+    id,
+    saida,
+    km_inicial,
+    chegada,
+    km_final,
+    descricao,
     veiculo: {
-      ...viagem.dataValues.veiculo.dataValues,
+      ...veiculo.dataValues,
     },
     motorista: {
-      ...viagem.dataValues.motoristum.dataValues,
+      ...motoristum.dataValues,
     },
   };
   delete vi.motorista.senha;
@@ -406,21 +418,19 @@ const convertViagem = viagem => {
 };
 
 const checkCNH = (motorista, veiculo) => {
-  if (motorista == veiculo) return true;
-
   if (motorista == null || veiculo == null) return false;
 
   switch (veiculo) {
     case 'A':
-      return ['AB', 'AC', 'AD', 'AE'].includes(motorista);
+      return ['A', 'AB', 'AC', 'AD', 'AE'].includes(motorista);
     case 'B':
-      return ['AB', 'AC', 'AD', 'AE', 'C', 'D', 'E'].includes(motorista);
+      return ['B', 'AB', 'AC', 'AD', 'AE', 'C', 'D', 'E'].includes(motorista);
     case 'C':
-      return ['AC', 'AD', 'AE', 'D', 'E'].includes(motorista);
+      return ['C', 'AC', 'AD', 'AE', 'D', 'E'].includes(motorista);
     case 'D':
-      return ['AD', 'E', 'AE'].includes(motorista);
+      return ['D', 'AD', 'E', 'AE'].includes(motorista);
     case 'E':
-      return ['AE'].includes(motorista);
+      return ['E', 'AE'].includes(motorista);
     default:
       return false;
   }
