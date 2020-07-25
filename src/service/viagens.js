@@ -222,7 +222,6 @@ exports.iniciar = async (req, res) => {
   }
 
   if (errors.length > 0) {
-    console.log(errors);
     return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: 'Parâmetro(s) inválido(s)',
       errors,
@@ -407,7 +406,6 @@ const convertViagem = viagem => {
 };
 
 const checkCNH = (motorista, veiculo) => {
-  console.log(motorista, veiculo);
   if (motorista == veiculo) return true;
 
   if (motorista == null || veiculo == null) return false;
