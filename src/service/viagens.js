@@ -221,11 +221,13 @@ exports.iniciar = async (req, res) => {
     salvar.km_inicial = parseFloat(km_inicial);
   }
 
-  if (errors.length > 0)
+  if (errors.length > 0) {
+    console.log(errors);
     return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: 'Parâmetro(s) inválido(s)',
       errors,
     });
+  }
 
   return models.sequelize
     .transaction(t => {
