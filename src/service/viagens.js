@@ -407,6 +407,7 @@ const convertViagem = viagem => {
 };
 
 const checkCNH = (motorista, veiculo) => {
+  console.log(motorista, veiculo);
   if (motorista == veiculo) return true;
 
   if (motorista == null || veiculo == null) return false;
