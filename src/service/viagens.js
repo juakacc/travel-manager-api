@@ -1,54 +1,15 @@
-const HttpStatus = require("http-status-codes");
-const sequelize = require("sequelize");
+const HttpStatus = require('http-status-codes');
+const sequelize = require('sequelize');
 const Op = sequelize.Op;
+const moment = require('moment');
 
-const models = require("../models");
+const models = require('../models');
 const Veiculo = models.veiculo;
 const Motorista = models.motorista;
 const Viagem = models.viagem;
 
 const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/;
 const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo
-
-const convertViagem = (viagem) => {
-  const vi = {
-    id: viagem.dataValues.id,
-    saida: viagem.dataValues.saida,
-    km_inicial: viagem.dataValues.km_inicial,
-    chegada: viagem.dataValues.chegada,
-    km_final: viagem.dataValues.km_final,
-    descricao: viagem.dataValues.descricao,
-    veiculo: {
-      ...viagem.dataValues.veiculo.dataValues,
-    },
-    motorista: {
-      ...viagem.dataValues.motoristum.dataValues,
-    },
-  };
-  delete vi.motorista.senha;
-  return vi;
-};
-
-const checkCNH = (motorista, veiculo) => {
-  if (motorista == veiculo) return true;
-
-  if (motorista == null || veiculo == null) return false;
-
-  switch (veiculo) {
-    case "A":
-      return ["AB", "AC", "AD", "AE"].includes(motorista);
-    case "B":
-      return ["AB", "AC", "AD", "AE", "C", "D", "E"].includes(motorista);
-    case "C":
-      return ["AC", "AD", "AE", "D", "E"].includes(motorista);
-    case "D":
-      return ["AD", "E", "AE"].includes(motorista);
-    case "E":
-      return ["AE"].includes(motorista);
-    default:
-      return false;
-  }
-};
 
 exports.get = (req, res) => {
   const { date, status } = req.query;
@@ -57,7 +18,7 @@ exports.get = (req, res) => {
     const s = status.toLowerCase();
 
     switch (s) {
-      case "concluida":
+      case 'concluida':
         Viagem.findAll({
           where: {
             chegada: {
@@ -66,21 +27,21 @@ exports.get = (req, res) => {
           },
           include: [Veiculo, Motorista],
           limit: 5,
-          order: [["chegada", "DESC"]],
+          order: [['chegada', 'DESC']],
         })
-          .then((viagens) => {
-            const result = viagens.map((viagem) => {
+          .then(viagens => {
+            const result = viagens.map(viagem => {
               return convertViagem(viagem);
             });
             return res.status(HttpStatus.OK).json(result);
           })
-          .catch((err) => {
+          .catch(err => {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-              mensagem: "Erro interno no servidor",
+              mensagem: 'Erro interno no servidor',
             });
           });
         break;
-      case "nao-concluida":
+      case 'nao-concluida':
         Viagem.findAll({
           where: {
             chegada: {
@@ -88,32 +49,32 @@ exports.get = (req, res) => {
             },
           },
           include: [Veiculo, Motorista],
-          order: [["saida", "DESC"]],
+          order: [['saida', 'DESC']],
         })
-          .then((viagens) => {
-            const result = viagens.map((viagem) => {
+          .then(viagens => {
+            const result = viagens.map(viagem => {
               return convertViagem(viagem);
             });
             return res.status(HttpStatus.OK).json(result);
           })
-          .catch((err) => {
+          .catch(err => {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-              mensagem: "Erro interno no servidor",
+              mensagem: 'Erro interno no servidor',
             });
           });
         break;
       default:
         return res.status(HttpStatus.BAD_REQUEST).json({
-          mensagem: "Status inválido",
+          mensagem: 'Status inválido',
         });
     }
   } else if (date) {
-    const data = date.replace("T", " ");
+    const data = date.replace('T', ' ');
     const s = new Date(data);
 
     if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime())) {
       return res.status(HttpStatus.BAD_REQUEST).json({
-        mensagem: "A data não segue o padrão: yyyy-MM-dd HH:mm:ss",
+        mensagem: 'A data não segue o padrão: yyyy-MM-dd HH:mm:ss',
       });
     }
     Viagem.findAll({
@@ -142,15 +103,15 @@ exports.get = (req, res) => {
       },
       include: [Veiculo, Motorista],
     })
-      .then((viagens) => {
-        const result = viagens.map((viagem) => {
+      .then(viagens => {
+        const result = viagens.map(viagem => {
           return convertViagem(viagem);
         });
         return res.status(HttpStatus.OK).json(result);
       })
-      .catch((err) => {
+      .catch(err => {
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          mensagem: "Erro interno no servidor",
+          mensagem: 'Erro interno no servidor',
         });
       });
   } else {
@@ -158,13 +119,13 @@ exports.get = (req, res) => {
       include: [Veiculo, Motorista],
       limit: 5,
     })
-      .then((viagens) => {
-        const result = viagens.map((viagem) => {
+      .then(viagens => {
+        const result = viagens.map(viagem => {
           return convertViagem(viagem);
         });
         return res.status(HttpStatus.OK).json(result);
       })
-      .catch((err) => {
+      .catch(err => {
         return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
           mensagem: err,
         });
@@ -176,17 +137,17 @@ exports.get_by_id = async (req, res) => {
   Viagem.findByPk(req.params.viagemId, {
     include: [Veiculo, Motorista],
   })
-    .then((viagem) => {
+    .then(viagem => {
       if (!viagem)
         return res.status(HttpStatus.NOT_FOUND).json({
-          mensagem: "Viagem não encontrada",
+          mensagem: 'Viagem não encontrada',
         });
       res.status(HttpStatus.OK).json(convertViagem(viagem));
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        mensagem: "Ocorreu um erro interno no servidor",
+        mensagem: 'Ocorreu um erro interno no servidor',
       });
     });
 };
@@ -203,23 +164,23 @@ exports.get_atual_by_motorista = (req, res, next) => {
     },
     include: [Veiculo, Motorista],
   })
-    .then((viagem) => {
+    .then(viagem => {
       if (!viagem)
         return res.status(HttpStatus.NOT_FOUND).json({
-          mensagem: "Viagem não encontrada",
+          mensagem: 'Viagem não encontrada',
         });
       return res.status(HttpStatus.OK).json(convertViagem(viagem));
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        mensagem: "Ocorreu um erro interno no servidor",
+        mensagem: 'Ocorreu um erro interno no servidor',
       });
     });
 };
 
 exports.iniciar = async (req, res) => {
-  const { saida, km_inicial, descricao, veiculo } = req.body;
+  const { km_inicial, descricao, veiculo } = req.body;
   const motorista = req.userData.id;
   const errors = [];
 
@@ -227,17 +188,17 @@ exports.iniciar = async (req, res) => {
 
   if (!veiculoBD) {
     return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "Veículo inexistente",
+      mensagem: 'Veículo inexistente',
     });
   } else if (!veiculoBD.dataValues.disponivel)
-    errors.push("Veículo indisponível");
+    errors.push('Veículo indisponível');
 
   const motoristaBD = await Motorista.findByPk(motorista);
 
-  if (!motoristaBD.dataValues.disponivel) errors.push("Motorista indisponível");
+  if (!motoristaBD.dataValues.disponivel) errors.push('Motorista indisponível');
 
   const salvar = {
-    saida,
+    saida: moment().format(),
     km_inicial,
     descricao,
     id_veiculo: veiculo,
@@ -247,68 +208,57 @@ exports.iniciar = async (req, res) => {
   if (
     !checkCNH(
       motoristaBD.dataValues.categoria,
-      veiculoBD.dataValues.cnh_requerida
+      veiculoBD.dataValues.cnh_requerida,
     )
   )
     errors.push(
-      `Habilitação necessária: ${veiculoBD.dataValues.cnh_requerida}`
+      `Habilitação necessária: ${veiculoBD.dataValues.cnh_requerida}`,
     );
 
-  if (!saida) {
-    errors.push("O momento da saída é obrigatório");
-  } else {
-    const data = saida.replace("T", " ");
-    const s = new Date(data);
-
-    if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime()))
-      errors.push("A data não segue o padrão: yyyy-MM-dd HH:mm:ss");
-    salvar.saida = s;
-  }
-
   if (!km_inicial || isNaN(km_inicial)) {
-    errors.push("O valor da quilometragem é inválido");
+    errors.push('O valor da quilometragem é inválido');
   } else {
     salvar.km_inicial = parseFloat(km_inicial);
   }
 
   if (errors.length > 0)
     return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "Parâmetro(s) inválido(s)",
+      mensagem: 'Parâmetro(s) inválido(s)',
       errors,
     });
 
   return models.sequelize
-    .transaction((t) => {
-      return Viagem.create(salvar, { transaction: t }).then((viagemSalva) => {
+    .transaction(t => {
+      return Viagem.create(salvar, { transaction: t }).then(viagemSalva => {
         return Promise.all([
           Veiculo.update(
             {
               disponivel: false,
             },
-            { where: { id: veiculo }, transaction: t }
+            { where: { id: veiculo }, transaction: t },
           ),
           Motorista.update(
             {
               disponivel: false,
             },
-            { where: { id: motorista }, transaction: t }
+            { where: { id: motorista }, transaction: t },
           ),
         ]).then(() => {
           return viagemSalva;
         });
       });
     })
-    .then((viagemSalva) => {
+    .then(viagemSalva => {
       return Viagem.findByPk(viagemSalva.id, {
         include: [Veiculo, Motorista],
-      }).then((viagem) => {
+      }).then(viagem => {
         return res.status(HttpStatus.CREATED).json(convertViagem(viagem));
       });
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        mensagem: "Ocorreu um erro interno no servidor",
+        mensagem: 'Ocorreu um erro interno no servidor',
       });
     });
 };
@@ -318,77 +268,36 @@ exports.concluir = async (req, res) => {
   const errors = [];
 
   const viagem = await Viagem.findByPk(viagemId);
-  if (!viagem) errors.push("Viagem não encontrada");
+  if (!viagem) errors.push('Viagem não encontrada');
 
-  const { saida, chegada, km_inicial, km_final, descricao } = req.body;
+  const { km_final, descricao } = req.body;
 
   const salvar = {
-    saida,
-    chegada,
+    chegada: moment().format(),
     km_final,
-    km_inicial,
     descricao,
   };
 
-  if (salvar.saida) {
-    const aux = salvar.saida.replace("T", " ");
-    const s = new Date(aux);
-
-    if ((!padrao.test(aux) && !padrao2.test(aux)) || isNaN(s.getTime())) {
-      errors.push("A data de saída não segue o padrão: yyyy-MM-dd HH:mm:ss");
-    } else {
-      salvar.saida = s; // Date
-    }
-  } else {
-    console.log("VIAGEM: ", viagem.dataValues.saida);
-    salvar.saida = new Date(viagem.dataValues.saida);
-  }
-
-  if (salvar.km_inicial) {
-    if (isNaN(salvar.km_inicial)) {
-      errors.push("O valor da quilometragem inicial é inválido");
-    } else {
-      salvar.km_inicial = parseFloat(salvar.km_inicial);
-    }
-  } else {
-    salvar.km_inicial = parseFloat(viagem.dataValues.km_inicial);
-  }
-
   if (!salvar.km_final || isNaN(salvar.km_final)) {
-    errors.push("O valor da quilometragem final é inválido");
+    errors.push('O valor da quilometragem final é inválido');
   } else {
     salvar.km_final = parseFloat(salvar.km_final);
   }
+  const km_inicial = parseFloat(viagem.dataValues.km_inicial);
 
-  if (salvar.km_final < salvar.km_inicial)
+  if (salvar.km_final < km_inicial)
     errors.push(
-      `KM final (${salvar.km_final}KM) não pode ser menor que KM inicial (${salvar.km_inicial}KM)`
+      `KM final (${salvar.km_final}KM) não pode ser menor que KM inicial (${km_inicial}KM)`,
     );
-
-  if (!salvar.chegada) {
-    errors.push("A momento de chegada é obrigatória");
-  } else {
-    const aux = salvar.chegada.replace("T", " ");
-    const s = new Date(aux);
-
-    if ((!padrao.test(aux) && !padrao2.test(aux)) || isNaN(s.getTime())) {
-      errors.push("A data de chegada não segue o padrão: yyyy-MM-dd HH:mm:ss");
-    } else {
-      salvar.chegada = s; // Date
-    }
-  }
-
-  if (salvar.chegada < salvar.saida)
-    errors.push("Data de chegada anterior a data de saída");
 
   if (errors.length > 0)
     return res.status(HttpStatus.BAD_REQUEST).json({
-      mensagem: "Parâmetro(s) inválido(s)",
+      mensagem: 'Parâmetro(s) inválido(s)',
       errors,
     });
 
   return models.sequelize
-    .transaction((t) => {
+    .transaction(t => {
       return Viagem.update(salvar, {
         where: { id: viagemId },
         transaction: t,
@@ -396,20 +305,20 @@ exports.concluir = async (req, res) => {
         return Viagem.findByPk(viagemId, {
           include: [Veiculo, Motorista],
           transaction: t,
-        }).then((viagem) => {
+        }).then(viagem => {
           return Promise.all([
             Veiculo.update(
               {
                 disponivel: true,
                 quilometragem: salvar.km_final,
               },
-              { where: { id: viagem.dataValues.id_veiculo }, transaction: t }
+              { where: { id: viagem.dataValues.id_veiculo }, transaction: t },
             ),
             Motorista.update(
               {
                 disponivel: true,
               },
-              { where: { id: viagem.dataValues.id_motorista }, transaction: t }
+              { where: { id: viagem.dataValues.id_motorista }, transaction: t },
             ),
           ]).then(() => {
             return viagem;
@@ -417,13 +326,13 @@ exports.concluir = async (req, res) => {
         });
       });
     })
-    .then((viagem) => {
+    .then(viagem => {
       return res.status(HttpStatus.OK).json(convertViagem(viagem));
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        mensagem: "Ocorreu um erro interno no servidor",
+        mensagem: 'Ocorreu um erro interno no servidor',
       });
     });
 };
@@ -434,7 +343,7 @@ exports.deletar = async (req, res) => {
   const viagem = await Viagem.findByPk(id);
   if (!viagem)
     return res.status(HttpStatus.NOT_FOUND).json({
-      mensagem: "Viagem não encontrada",
+      mensagem: 'Viagem não encontrada',
     });
 
   const veiculoId = viagem.dataValues.id_veiculo;
@@ -442,24 +351,24 @@ exports.deletar = async (req, res) => {
   const nao_concluida = viagem.dataValues.chegada == null;
 
   return models.sequelize
-    .transaction((t) => {
+    .transaction(t => {
       return Viagem.destroy({
         where: { id },
         transaction: t,
-      }).then((rows) => {
+      }).then(rows => {
         if (rows > 0 && nao_concluida) {
           return Promise.all([
             Veiculo.update(
               {
                 disponivel: true,
               },
-              { where: { id: veiculoId }, transaction: t }
+              { where: { id: veiculoId }, transaction: t },
             ),
             Motorista.update(
               {
                 disponivel: true,
               },
-              { where: { id: motoristaId }, transaction: t }
+              { where: { id: motoristaId }, transaction: t },
             ),
           ]);
         }
@@ -468,10 +377,50 @@ exports.deletar = async (req, res) => {
     .then(() => {
       return res.status(HttpStatus.NO_CONTENT).send();
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        mensagem: "Ocorreu um erro interno no servidor",
+        mensagem: 'Ocorreu um erro interno no servidor',
       });
     });
+};
+
+const convertViagem = viagem => {
+  const vi = {
+    id: viagem.dataValues.id,
+    saida: viagem.dataValues.saida,
+    km_inicial: viagem.dataValues.km_inicial,
+    chegada: viagem.dataValues.chegada,
+    km_final: viagem.dataValues.km_final,
+    descricao: viagem.dataValues.descricao,
+    veiculo: {
+      ...viagem.dataValues.veiculo.dataValues,
+    },
+    motorista: {
+      ...viagem.dataValues.motoristum.dataValues,
+    },
+  };
+  delete vi.motorista.senha;
+  return vi;
+};
+
+const checkCNH = (motorista, veiculo) => {
+  if (motorista == veiculo) return true;
+
+  if (motorista == null || veiculo == null) return false;
+
+  switch (veiculo) {
+    case 'A':
+      return ['AB', 'AC', 'AD', 'AE'].includes(motorista);
+    case 'B':
+      return ['AB', 'AC', 'AD', 'AE', 'C', 'D', 'E'].includes(motorista);
+    case 'C':
+      return ['AC', 'AD', 'AE', 'D', 'E'].includes(motorista);
+    case 'D':
+      return ['AD', 'E', 'AE'].includes(motorista);
+    case 'E':
+      return ['AE'].includes(motorista);
+    default:
+      return false;
+  }
 };
