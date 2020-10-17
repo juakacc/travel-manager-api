@@ -46,6 +46,8 @@ const router = express.Router();
 router.post("/", (req, res, next) => {
   const { apelido, senha } = req.body;
 
+  console.log(apelido, senha);
+
   if (!apelido) {
     return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: "Apelido é obrigatório",
@@ -68,6 +70,8 @@ router.post("/", (req, res, next) => {
         });
       }
       const motorista = motoristas[0].dataValues;
+
+      console.log(motorista);
 
       if (!bcrypt.compareSync(senha, motorista.senha)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
