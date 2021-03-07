@@ -8,7 +8,12 @@ const Servico = require('../models').servico;
 const Revisao = require('../models').servico_revisao;
 
 exports.get_all = (req, res, next) => {
-  Veiculo.findAll()
+  Veiculo.findAll({
+    attributes: ['id', 'nome', 'placa', 'renavam', 'marca', 'modelo', 'quilometragem', 'disponivel', 'cnh_requerida'], 
+    order: [
+      ['nome', 'ASC']
+    ]
+  })
     .then(veiculos => {
       res.status(HttpStatus.OK).json(veiculos);
     })
@@ -23,6 +28,10 @@ exports.get_all = (req, res, next) => {
 exports.get_disponiveis = (req, res, next) => {
   Veiculo.findAll({
     where: { disponivel: true },
+    attributes: ['id', 'nome', 'placa', 'renavam', 'marca', 'modelo', 'quilometragem', 'cnh_requerida'], 
+    order: [
+      ['nome', 'ASC']
+    ]
   })
     .then(veiculos => {
       res.status(HttpStatus.OK).json(veiculos);

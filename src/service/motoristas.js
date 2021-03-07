@@ -5,13 +5,14 @@ const bcrypt = require('bcryptjs');
 const constantes = require('../constantes');
 
 exports.get_all = (req, res, next) => {
-  Motorista.findAll()
+  Motorista.findAll({
+    order: [
+      ['apelido', 'ASC']
+    ],
+    attributes: ['id', 'nome', 'apelido', 'cnh', 'categoria', 'telefone', 'disponivel']
+  })
     .then(motoristas => {
-      const result = motoristas.map(motorista => {
-        delete motorista.dataValues.senha;
-        return motorista;
-      });
-      res.status(HttpStatus.OK).json(result);
+      res.status(HttpStatus.OK).json(motoristas);
     })
     .catch(err => {
       console.log(err);
