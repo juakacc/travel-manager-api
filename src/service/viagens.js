@@ -190,12 +190,15 @@ exports.iniciar = async (req, res) => {
     return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: 'Veículo inexistente',
     });
-  } else if (!veiculoBD.dataValues.disponivel)
+  } else if (!veiculoBD.dataValues.disponivel) {
     errors.push('Veículo indisponível');
+  }
 
   const motoristaBD = await Motorista.findByPk(motorista);
 
-  if (!motoristaBD.dataValues.disponivel) errors.push('Motorista indisponível');
+  if (!motoristaBD.dataValues.disponivel) {
+    errors.push('Motorista indisponível');
+  }
 
   const salvar = {
     saida: moment().format(),
@@ -236,6 +239,7 @@ exports.iniciar = async (req, res) => {
           Veiculo.update(
             {
               disponivel: false,
+              quilometragem: salvar.km_inicial,
             },
             { where: { id: veiculo }, transaction: t },
           ),
