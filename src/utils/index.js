@@ -14,4 +14,24 @@ const validar_data = (date) => {
   }
 };
 
+const checkCNH = (motorista, veiculo) => {
+  if (motorista == null || veiculo == null) return false;
+
+  switch (veiculo) {
+    case 'A':
+      return ['A', 'AB', 'AC', 'AD', 'AE'].includes(motorista);
+    case 'B':
+      return ['B', 'AB', 'AC', 'AD', 'AE', 'C', 'D', 'E'].includes(motorista);
+    case 'C':
+      return ['C', 'AC', 'AD', 'AE', 'D', 'E'].includes(motorista);
+    case 'D':
+      return ['D', 'AD', 'E', 'AE'].includes(motorista);
+    case 'E':
+      return ['E', 'AE'].includes(motorista);
+    default:
+      return false;
+  }
+};
+
 module.exports = validar_data;
+module.exports = checkCNH;

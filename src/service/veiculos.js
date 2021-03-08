@@ -3,9 +3,12 @@ const Op = Sequelize.Op;
 const HttpStatus = require('http-status-codes');
 const moment = require('moment');
 
+const Motorista = require('../models').motorista;
 const Veiculo = require('../models').veiculo;
 const Servico = require('../models').servico;
 const Revisao = require('../models').servico_revisao;
+
+const checkCNH = require('../utils');
 
 exports.get_all = (req, res, next) => {
   Veiculo.findAll({
@@ -34,7 +37,15 @@ exports.get_disponiveis = (req, res, next) => {
     ]
   })
     .then(veiculos => {
-      res.status(HttpStatus.OK).json(veiculos);
+      const motorista_id = req.userData.id;
+
+      Motorista.findByPk(motorista_id).then(motoristaBD => {
+        const categoria = motoristaBD.dataValues.categoria;
+        res.status(HttpStatus.OK).json(veiculos.filter(v => checkCNH(categoria, v.cnh_requerida)));
+      })      
+      .catch(() => {
+        res.status(HttpStatus.OK).json(veiculos);
+      });
     })
     .catch(err => {
       console.log(err);

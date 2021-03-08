@@ -2,6 +2,7 @@ const HttpStatus = require('http-status-codes');
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
 const moment = require('moment');
+const checkCNH = require('../utils');
 
 const models = require('../models');
 const Veiculo = models.veiculo;
@@ -419,23 +420,4 @@ const convertViagem = viagem => {
   };
   delete vi.motorista.senha;
   return vi;
-};
-
-const checkCNH = (motorista, veiculo) => {
-  if (motorista == null || veiculo == null) return false;
-
-  switch (veiculo) {
-    case 'A':
-      return ['A', 'AB', 'AC', 'AD', 'AE'].includes(motorista);
-    case 'B':
-      return ['B', 'AB', 'AC', 'AD', 'AE', 'C', 'D', 'E'].includes(motorista);
-    case 'C':
-      return ['C', 'AC', 'AD', 'AE', 'D', 'E'].includes(motorista);
-    case 'D':
-      return ['D', 'AD', 'E', 'AE'].includes(motorista);
-    case 'E':
-      return ['E', 'AE'].includes(motorista);
-    default:
-      return false;
-  }
 };

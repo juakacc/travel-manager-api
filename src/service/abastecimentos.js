@@ -95,7 +95,6 @@ exports.save = async (req, res) => {
     id_veiculo: veiculo,
     id_responsavel: req.userData.id,
   };
-  console.log(moment().format());
 
   Abastecimento.create(salvar)
     .then((abastecimento) => {

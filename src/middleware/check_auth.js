@@ -21,7 +21,7 @@ const check = async (req, res, next, role) => {
         if (permissoes.length == 0) {
           permissoes.push(constantes.MOTORISTA);
         }
-        // console.log('Permissões do usuário:', permissoes)
+        
         if (
           permissoes.includes(role) ||
           permissoes.includes(constantes.ADMIN)
