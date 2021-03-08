@@ -72,6 +72,8 @@ exports.get = (req, res) => {
   } else if (date) {
     const data = date.replace('T', ' ');
     const s = new Date(data);
+    console.log('enviada: ' + moment(data).format())
+    console.log('agora: ' + moment().format())
 
     if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime())) {
       return res.status(HttpStatus.BAD_REQUEST).json({
