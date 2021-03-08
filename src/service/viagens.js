@@ -78,12 +78,15 @@ exports.get = (req, res) => {
         mensagem: 'A data não segue o padrão: yyyy-MM-dd HH:mm:ss',
       });
     }
+
+    const data2 = moment(data).format()
+
     Viagem.findAll({
       where: {
         [Op.and]: [
           {
             saida: {
-              [Op.lte]: data,
+              [Op.lte]: data2,
             },
           },
           {
@@ -95,7 +98,7 @@ exports.get = (req, res) => {
               },
               {
                 chegada: {
-                  [Op.gte]: data,
+                  [Op.gte]: data2,
                 },
               },
             ],
