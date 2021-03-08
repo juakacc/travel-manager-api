@@ -111,6 +111,8 @@ exports.get = (req, res) => {
     })
       .then(viagens => {
         const result = viagens.map(viagem => {
+          console.log(viagem.dataValues.saida)
+          console.log(moment(viagem.dataValues.saida).format())
           return convertViagem(viagem);
         });
         return res.status(HttpStatus.OK).json(result);

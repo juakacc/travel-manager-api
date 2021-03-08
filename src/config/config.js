@@ -12,16 +12,14 @@ module.exports = {
     dialect: 'mysql',
     dialectOptions: {
       useUTC: false, // for reading from database
-      bigNumberStrings: true,
-
       dateStrings: true,
-      typeCast: function (field, next) {
-        // for reading from database
+      typeCast: function (field, next) { // for reading from database
         if (field.type === 'DATETIME') {
           return field.string();
         }
         return next();
       },
+      bigNumberStrings: true,
     },
     timezone: '-03:00', // for writing to database
   },
@@ -58,16 +56,14 @@ module.exports = {
     logging: false,
     dialectOptions: {
       useUTC: false, // for reading from database
-      bigNumberStrings: true,
-
       dateStrings: true,
-      typeCast: function (field, next) {
-        // for reading from database
+      typeCast: function (field, next) { // for reading from database
         if (field.type === 'DATETIME') {
           return field.string();
         }
         return next();
       },
+      bigNumberStrings: true,
     },
     timezone: '-03:00', // for writing to database
   },
