@@ -34,12 +34,7 @@
     "nodemon": "^2.0.2",
     "sequelize": "^5.21.4",
     "sequelize-cli": "^5.5.1"
-  },
-  "apidoc": {
-    "title": "ViagensPMO API Rest",
-    "url": "http://localhost:8888",
-    "version": "1.0.0"
-  },
+  },  
   "devDependencies": {
     "apidoc": "^0.20.1",
     "chai": "^4.2.0",
