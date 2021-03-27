@@ -113,8 +113,6 @@ router.get(
  *
  * @apiUse Header
  *
- * @apiParam {Number} motoristaId Id do motorista
- *
  * @apiSuccess {Number} id          Id da viagem
  * @apiSuccess {String} saida       Momento do início da viagem
  * @apiSuccess {Number} km_inicial  Quilometragem inicial do veículo
@@ -165,7 +163,7 @@ router.get(
   (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA),
   viagens.get_atual_by_motorista
 );
-// Manter compatível
+// Para manter compatibilidade com primeira versao do app
 router.get(
   "/atual/:id",
   (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA),
@@ -243,18 +241,14 @@ router.get(
  *
  * @apiUse Header
  *
- * @apiParam {String="yyyy-MM-dd hh:mm:ss"} saida       Momento do início da viagem
  * @apiParam {Number}                       km_inicial  Quilometragem inicial da viagem
  * @apiParam {String}                       [descricao] Descrição sobre a viagem
  * @apiParam {Number}                       veiculo     <code>Id</code> do veículo
- * @apiParam {Number}                       motorista   <code>Id</code> do motorista
  *
  * @apiParamExample {json} Request-Example:
  *    {
- *        "saida": "2020-01-20 20:52:32",
  *        "km_inicial": 200,
- *        "veiculo": 1,
- *        "motorista": 1
+ *        "veiculo": 1
  *    }
  *
  * @apiSuccess {Number} id          Id da viagem
@@ -343,19 +337,13 @@ router.post(
  *
  * @apiParam {Number} viagemId Id da viagem
  *
- * @apiParam {String="yyyy-MM-dd hh:mm:ss"} chegada      Momento do fim da viagem
  * @apiParam {Number}                       km_final     Quilometragem final da viagem
- * @apiParam {String="yyyy-MM-dd hh:mm:ss"} [saida]      Momento do início da viagem
- * @apiParam {Number}                       [km_inicial] Quilometragem inicial da viagem
  * @apiParam {String}                       [descricao]  Descrição sobre a viagem
  *
  * @apiParamExample {json} Request-Example:
  *    {
- *        "saida": "2020-01-20 20:52:32",
- *        "km_inicial": 200,
- *        "chegada": "2020-01-20 22:52:32",
  *        "km_final": 400,
- *        "descricao": "São José da Lagoa Tapada"
+ *        "descricao": "Viagem para São José da Lagoa Tapada"
  *    }
  *
  * @apiSuccess {Number} id          Id da viagem

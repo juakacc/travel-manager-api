@@ -160,13 +160,13 @@ router.get(
  *
  * @apiUse Header
  *
- * @apiParam {String}                                         nome              Nome do veiculo.
- * @apiParam {String}                                         placa             Placa do veiculo.
- * @apiParam {String}                                         renavam           Renavam do veiculo.
- * @apiParam {String}                                         marca             Marca do veiculo.
- * @apiParam {String}                                         modelo            Modelo do veiculo.
- * @apiParam {Number}                                         [quilometragem=0] Quilometragem atual do veiculo.
- * @apiParam {String="A","B","C","D","E","AB","AC","AD","AE"} cnh_requerida     CNH requerida para conduzir o veiculo.
+ * @apiParam {String}                     nome              Nome do veiculo.
+ * @apiParam {String}                     placa             Placa do veiculo.
+ * @apiParam {String}                     renavam           Renavam do veiculo.
+ * @apiParam {String}                     marca             Marca do veiculo.
+ * @apiParam {String}                     modelo            Modelo do veiculo.
+ * @apiParam {Number}                     [quilometragem=0] Quilometragem atual do veiculo.
+ * @apiParam {String="A","B","C","D","E"} cnh_requerida     CNH requerida para conduzir o veiculo.
  *
  * @apiParamExample {json} Request-Example:
  *     {
@@ -224,13 +224,13 @@ router.post(
  *
  * @apiParam  {Number} veiculoId Id do veículo
  *
- * @apiParam {String}                                         [nome]          Nome do veiculo.
- * @apiParam {String}                                         [placa]         Placa do veiculo.
- * @apiParam {String}                                         [renavam]       Renavam do veiculo.
- * @apiParam {String}                                         [marca]         Marca do veiculo.
- * @apiParam {String}                                         [modelo]        Modelo do veiculo.
- * @apiParam {Number}                                         [quilometragem] Quilometragem atual do veiculo.
- * @apiParam {String="A","B","C","D","E","AB","AC","AD","AE"} [cnh_requerida] CNH requerida para conduzir o veiculo.
+ * @apiParam {String}                     [nome]          Nome do veiculo.
+ * @apiParam {String}                     [placa]         Placa do veiculo.
+ * @apiParam {String}                     [renavam]       Renavam do veiculo.
+ * @apiParam {String}                     [marca]         Marca do veiculo.
+ * @apiParam {String}                     [modelo]        Modelo do veiculo.
+ * @apiParam {Number}                     [quilometragem] Quilometragem atual do veiculo.
+ * @apiParam {String="A","B","C","D","E"} [cnh_requerida] CNH requerida para conduzir o veiculo.
  *
  * @apiParamExample {json} Request-Example:
  *     {
