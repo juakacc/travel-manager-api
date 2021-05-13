@@ -73,7 +73,6 @@ exports.get = (req, res) => {
     const data = date.replace('T', ' ');
     const s = new Date(data);
     console.log('enviada: ' + moment(data).format())
-    console.log('agora: ' + moment().format())
 
     if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime())) {
       return res.status(HttpStatus.BAD_REQUEST).json({
@@ -81,12 +80,17 @@ exports.get = (req, res) => {
       });
     }
 
-    const data2 = moment(data).format()
+    const data2 = moment(data).add(3, 'hours').format()
+    console.log('ajustada: ' + data2)
 
     Viagem.findAll({
       where: {
         [Op.and]: [
-          sequelize.where(sequelize.fn('date', sequelize.col('saida')), '<=', data2),
+          {
+            saida: {
+              [Op.lte]: data2,
+            },
+          },
           {
             [Op.or]: [
               {
@@ -94,28 +98,13 @@ exports.get = (req, res) => {
                   [Op.is]: null,
                 },
               },
-              sequelize.where(sequelize.fn('date', sequelize.col('chegada')), '>=', data2)
+              {
+                chegada: {
+                  [Op.gte]: data2,
+                },
+              },
             ],
           },
-          //{
-          //  saida: {
-          //    [Op.lte]: data2,
-          //  },
-          //},
-          //{
-          //  [Op.or]: [
-          //    {
-          //      chegada: {
-          //        [Op.is]: null,
-          //      },
-          //    },
-          //    {
-          //      chegada: {
-          //        [Op.gte]: data2,
-          //      },
-          //    },
-          //  ],
-          //},
         ],
       },
       include: [Veiculo, Motorista],
