@@ -86,11 +86,7 @@ exports.get = (req, res) => {
     Viagem.findAll({
       where: {
         [Op.and]: [
-          {
-            saida: {
-              [Op.lte]: data2,
-            },
-          },
+          sequelize.where(sequelize.fn('date', sequelize.col('saida')), '<=', data2),
           {
             [Op.or]: [
               {
@@ -98,13 +94,28 @@ exports.get = (req, res) => {
                   [Op.is]: null,
                 },
               },
-              {
-                chegada: {
-                  [Op.gte]: data2,
-                },
-              },
+              sequelize.where(sequelize.fn('date', sequelize.col('chegada')), '>=', data2)
             ],
           },
+          //{
+          //  saida: {
+          //    [Op.lte]: data2,
+          //  },
+          //},
+          //{
+          //  [Op.or]: [
+          //    {
+          //      chegada: {
+          //        [Op.is]: null,
+          //      },
+          //    },
+          //    {
+          //      chegada: {
+          //        [Op.gte]: data2,
+          //      },
+          //    },
+          //  ],
+          //},
         ],
       },
       include: [Veiculo, Motorista],
