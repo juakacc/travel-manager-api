@@ -11,6 +11,10 @@ module.exports = {
     port: 3306,
     dialect: 'mysql',
     dialectOptions: {
+      options: {
+        useUTC: false,
+        dateFirst: 1
+      },
       dateStrings: true,
       typeCast: function (field, next) { // for reading from database
         if (field.type === 'DATETIME') {
@@ -31,6 +35,10 @@ module.exports = {
     dialect: 'mysql',
     logging: false,
     dialectOptions: {
+      options: {
+        useUTC: false,
+        dateFirst: 1
+      },
       bigNumberStrings: true,
 
       dateStrings: true,
@@ -53,6 +61,10 @@ module.exports = {
     dialect: 'mysql',
     logging: false,
     dialectOptions: {
+      options: {
+        useUTC: false,
+        dateFirst: 1
+      },
       dateStrings: true,
       typeCast: function (field, next) { // for reading from database
         if (field.type === 'DATETIME') {

@@ -38,12 +38,11 @@ const check = async (req, res, next, role) => {
           });
         }
       })
-      .catch((err) => {
-        console.error(err);
+      .catch((erro) => {
+        console.error(erro);
         return res.status(HttpStatus.UNAUTHORIZED).json({
           mensagem: "Erro na validação",
-          tokenExpirado,
-          erro,
+          tokenExpirado: false
         });
       });
   } catch (erro) {
