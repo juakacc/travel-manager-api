@@ -10,7 +10,7 @@ const Motorista = models.motorista;
 const Viagem = models.viagem;
 
 const padrao = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/;
-const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo
+const padrao2 = /^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}$/; // app antigo, manter compatibilidade
 
 exports.get = (req, res) => {
   const { date, status } = req.query;
@@ -72,16 +72,14 @@ exports.get = (req, res) => {
   } else if (date) {
     const data = date.replace('T', ' ');
     const s = new Date(data);
-    console.log('enviada: ' + moment(data).format())
 
     if ((!padrao.test(data) && !padrao2.test(data)) || isNaN(s.getTime())) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         mensagem: 'A data não segue o padrão: yyyy-MM-dd HH:mm:ss',
       });
     }
-
+    // ajuste por conta do timezone do heroku
     const data2 = moment(data).add(3, 'hours').format()
-    console.log('ajustada: ' + data2)
 
     Viagem.findAll({
       where: {
@@ -111,8 +109,6 @@ exports.get = (req, res) => {
     })
       .then(viagens => {
         const result = viagens.map(viagem => {
-          console.log(viagem.dataValues.saida)
-          console.log(moment(viagem.dataValues.saida).format())
           return convertViagem(viagem);
         });
         return res.status(HttpStatus.OK).json(result);
