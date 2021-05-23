@@ -1,5 +1,6 @@
-const HttpStatus = require("http-status-codes");
 const moment = require("moment");
+const HttpStatus = require("http-status-codes");
+
 const Veiculo = require("../models").veiculo;
 const Abastecimento = require("../models").abastecimento;
 
