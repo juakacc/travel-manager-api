@@ -141,6 +141,7 @@ exports.delete = async (req, res) => {
 };
 
 const save_servico = async (req, res, id_veiculo, servico) => {
+  console.log(servico);
   const { quilometragem, descricao, revisao } = servico;
   let update_km = false;
   const errors = [];
