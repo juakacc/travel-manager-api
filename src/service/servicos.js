@@ -261,7 +261,7 @@ const validar_revisao = (revisao, quilometragem) => {
     if (isNaN(q)) {
       errors.push("A quilometragem da revisão é inválida");
     } else {
-      if (q <= quilometragem)
+      if (parseFloat(q) <= parseFloat(quilometragem))
         errors.push("Quilometragem da revisão anterior a do serviço");
     }
   }
