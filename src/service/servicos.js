@@ -196,7 +196,10 @@ const save_servico = async (req, res, id_veiculo, servico) => {
           }
         )
           .then(() => finish_save(res, servico, revisao))
-          .catch(() => finish_save(res, servico, revisao));
+          .catch((err) => {
+            console.log(err);
+            finish_save(res, servico, revisao)
+          });
       } else {
         return finish_save(res, servico, revisao);
       }
@@ -234,7 +237,8 @@ const save_revisao = (res, servico, revisao) => {
       });
       return res.status(HttpStatus.CREATED).json(servicoRevisao);
     })
-    .catch(() => {
+    .catch((err) => {
+      console.log(err);
       return res.status(HttpStatus.CREATED).json(servico);
     });
 };
