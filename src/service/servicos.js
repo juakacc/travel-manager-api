@@ -170,6 +170,7 @@ const save_servico = async (req, res, id_veiculo, servico) => {
   }
 
   if (errors.length > 0) {
+    console.log(errors);
     return res.status(HttpStatus.BAD_REQUEST).json({
       mensagem: "Parâmetro(s) inválido(s)",
       errors,
