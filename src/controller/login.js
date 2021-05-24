@@ -3,6 +3,8 @@ const HttpStatus = require("http-status-codes");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const check_auth = require("../middleware/check_auth");
+const constantes = require("../constantes");
 const Motorista = require("../models").motorista;
 
 const router = express.Router();
@@ -99,5 +101,16 @@ router.post("/", (req, res, next) => {
       });
     });
 });
+
+const saveToken = (req, res, next) => {
+  // realizar persistencia do token no banco
+  return res.status(HttpStatus.OK).json({
+    token: req.body.token
+  })
+}
+
+router.post('/save-token/', 
+  (req, res, next) => check_auth(req, res, next, constantes.MOTORISTA), 
+  saveToken);
 
 module.exports = router;
