@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const check_auth = require("../middleware/check_auth");
 const constantes = require("../constantes");
 const Motorista = require("../models").motorista;
+const UserTokenFCM = require("../models").user_tokenfcm;
 
 const router = express.Router();
 
@@ -102,11 +103,32 @@ router.post("/", (req, res, next) => {
     });
 });
 
-const saveToken = (req, res, next) => {
-  // realizar persistencia do token no banco
-  return res.status(HttpStatus.OK).json({
-    token: req.body.token
+const saveToken = async (req, res, next) => {
+
+  const jaExiste = await UserTokenFCM.findOne({
+    token: req.body.token,
+    id_user: req.userData.id
   })
+
+  if (!jaExiste) {
+    UserTokenFCM.create({
+      token: req.body.token,
+      id_user: req.userData.id
+    })
+    .then(savedToken => {
+      return res.status(HttpStatus.OK).json(savedToken.dataValues);
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        mensagem: err,
+      });
+    })
+  } else {
+    return res.status(HttpStatus.BAD_REQUEST).json({
+      mensagem: 'Token já persistido pelo sistema!'
+    });
+  }
 }
 
 router.post('/save-token/', 
