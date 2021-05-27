@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     quilometragem: DataTypes.DECIMAL,
     disponivel:    DataTypes.BOOLEAN,
     cnh_requerida: DataTypes.STRING,
+    cidade:        DataTypes.STRING
   }, {
     timestamps: false,
     freezeTableName: true
