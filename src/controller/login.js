@@ -63,7 +63,9 @@ router.post("/", (req, res, next) => {
   }
 
   Motorista.findAll({
-    where: { apelido },
+    where: { 
+      apelido: apelido.toLowerCase()
+    },
   })
     .then((motoristas) => {
       if (motoristas.length < 1) {
