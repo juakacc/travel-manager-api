@@ -2,6 +2,7 @@ const express = require("express");
 const HttpStatus = require("http-status-codes");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const moment = require('moment');
 
 const check_auth = require("../middleware/check_auth");
 const constantes = require("../constantes");
@@ -89,6 +90,21 @@ router.post("/", (req, res, next) => {
         //   // expiresIn: '1min'
         // }
       );
+
+      // atualiza o last login
+      Motorista.update({
+        ultimo_login: moment().format()
+      }, {
+        where: {
+          id: motorista.id
+        }
+      })
+      .then(() => {
+        console.log('Data de login salva...');
+      })
+      .catch(err => {
+        console.log(err);
+      })
 
       return res.status(HttpStatus.OK).json({
         id: motorista.id,
